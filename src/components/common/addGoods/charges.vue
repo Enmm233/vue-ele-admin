@@ -7,32 +7,25 @@
 						<div class="xian"></div>
 						可选收付费项目
 					</div>
-					<!-- 	<div class="tit_select">
-						<el-select placeholder="请选择产品分类" class="handle-select mr10">
-							<el-option key="bbk" label="步步高" value="bbk"></el-option>
-							<el-option key="xtc" label="小天才" value="xtc"></el-option>
-							<el-option key="imoo" label="imoo" value="imoo"></el-option>
-						</el-select>
-					</div> -->
 				</div>
 
-				<el-table ref="multipleTable" :data="goodsAList" border tooltip-effect="dark" style="width: 100%" height="400"
+				<el-table ref="multipleTable" :data="goodsAList.data" border tooltip-effect="dark" style="width: 100%" height="400"
 				 row-key="date" @selection-change="handleSelectionChange1">
 					<el-table-column type="selection" width="55">
 					</el-table-column>
-					<el-table-column prop="date" label="收付费项目ID" width="180">
+					<el-table-column prop="id" label="收付费项目ID" width="120">
 					</el-table-column>
-					<el-table-column prop="name" label="收付费项目名称" width="250">
+					<el-table-column prop="name" label="收付费项目名称" width="150">
 					</el-table-column>
-					<el-table-column label="价格" width="100">
+					<el-table-column label="价格" width="80">
 						<template slot-scope="scope">
-							<span>{{ scope.row.address }}</span>
+							<span>¥{{ scope.row.price }}</span>
 						</template>
 					</el-table-column>
 				</el-table>
 				<div class="pagination">
-					<el-pagination background layout="total, prev, pager, next" :current-page="query.pageIndex" :page-size="query.pageSize"
-					 :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+					<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10"
+					 @current-change="handlePageChange"></el-pagination>
 				</div>
 			</div>
 			<div class="btn">
@@ -50,21 +43,13 @@
 				 row-key="date" @selection-change="handleSelectionChange2">
 					<el-table-column type="selection" width="55">
 					</el-table-column>
-					<el-table-column prop="date" label="收付费项目ID" width="180">
+					<el-table-column prop="id" label="收付费项目ID" width="120">
 					</el-table-column>
-					<el-table-column prop="name" label="收付费项目名称" width="250">
+					<el-table-column prop="name" label="收付费项目名称" width="150">
 					</el-table-column>
-					<el-table-column label="价格" width="100">
+					<el-table-column label="价格" width="80">
 						<template slot-scope="scope">
-							<span>{{ scope.row.address }}</span>
-						</template>
-					</el-table-column>
-					<el-table-column label="操作类型" width="100">
-						<template slot-scope="scope">
-							<el-select placeholder="默认" class="handle-select mr10">
-								<el-option key="bbk" label="开关" value="bbk"></el-option>
-								<el-option key="xtc" label="数量" value="xtc"></el-option>
-							</el-select>
+							<span>¥{{ scope.row.price }}</span>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -74,46 +59,58 @@
 </template>
 
 <script>
+	import {
+		listShopExpenseItem
+	} from '../../../api/index';
+	import { mapState } from 'vuex'
 	export default {
 		name: 'shuttle',
 		props: ['num'],
+		computed:{
+		     ...mapState(['accountId']),  //显示state的数据
+		    },
 		data() {
 			return {
-				query: {
-					pageIndex: 1,
-					pageSize: 10
-				},
-				pageTotal: 10,
-				goodsAList: [{
-					date: '1',
-					name: '王小虎',
-					address: '100'
-				}, {
-					date: '2',
-					name: '王小虎',
-					address: '120'
-				}, {
-					date: '3',
-					name: '王小虎',
-					address: '300'
-				}, {
-					date: '4',
-					name: '王小虎',
-					address: '1517'
-				}, {
-					date: '5',
-					name: '王小虎',
-					address: '1519'
-				}],
+				page: 1,
+				pageTotal: 0,
+				goodsAList: [],
 				goodsAData: [],
 				multipleSelection1: '',
 				multipleSelection2: '',
 			};
 		},
+		created() {
+			this.getData();
+		},
 		methods: {
 			// 分页导航
 			handlePageChange(val) {
-				console.log(val)
+				this.page = val;
+				this.getData();
+			},
+			getData() {
+				this.goodsAList = [];
+				this.goodsAData = [];
+				var query = {
+					data: {
+						// accountId:localStorage.getItem('account_id'),
+						accountId: this.accountId,
+						name: '',
+						type: 0,
+						sort: 0,
+						expenseType: 0,
+						showType: 0,
+						nowPage: this.page,
+						pageCount: 9,
+					}
+				};
+				listShopExpenseItem(query).then(res => {
+					if (res.code == 1) {
+						// console.log(res)
+						this.goodsAList = res;
+						this.pageTotal = res.allPage;
+					}
+				});
 			},
 			handleSelectionChange1(val) {
 				this.multipleSelection1 = val;
@@ -123,19 +120,19 @@
 			},
 			left() {
 				let arr = this.multipleSelection2;
-				this.goodsAData = this.goodsAData.filter(t => !arr.some(s => s.date === t.date))
+				this.goodsAData = this.goodsAData.filter(t => !arr.some(s => s.id === t.id))
 				for (var i = 0; i < arr.length; i++) {
-					this.goodsAList.push(arr[i])
+					this.goodsAList.data.push(arr[i])
 				}
-				console.log('从2到1')
+				// console.log('从2到1')
 			},
 			right() {
 				let arr = this.multipleSelection1;
-				this.goodsAList = this.goodsAList.filter(t => !arr.some(s => s.date === t.date))
+				this.goodsAList.data = this.goodsAList.data.filter(t => !arr.some(s => s.id === t.id))
 				for (var i = 0; i < arr.length; i++) {
 					this.goodsAData.push(arr[i])
 				}
-				console.log('从1到2' + this.goodsAData)
+				// console.log('从1到2' + this.goodsAData)
 			}
 		}
 	}

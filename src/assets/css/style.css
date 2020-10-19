@@ -76,8 +76,8 @@
 }
 
 .flex_wrap {
-	flex-wrap: wrap;
-	-webkit-flex-wrap: wrap;
+	flex-wrap: wrap !important;
+	-webkit-flex-wrap: wrap !important;
 }
 
 .marginR10 {
@@ -88,12 +88,23 @@
 	margin-bottom: 10px;
 }
 
+.marginB20 {
+	margin-bottom: 20px;
+}
+
 .paddingL15 {
 	padding-left: 15px;
 }
 
 .paddingL30 {
 	padding-left: 30px;
+}
+
+.paddingB15 {
+	padding-bottom: 15px;
+}
+.paddingT15 {
+	padding-top: 15px;
 }
 
 .ssmall_btn {
@@ -180,4 +191,7 @@
 
 #s-desc img {
 	width: 100%;
+}
+.goods_list .detail_box .con_body .describe p image{
+	    width: 100% !important;
 }

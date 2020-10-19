@@ -1,5 +1,5 @@
 {
-  "name": "vue-manage-system",
+  "name": "admin",
   "version": "4.2.0",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "echarts": "^4.9.0",
     "element-ui": "^2.11.0",
     "mavon-editor": "^2.6.17",
+    "pako": "^1.0.11",
     "vue": "^2.6.10",
     "vue-amap": "^0.5.10",
     "vue-cropperjs": "^3.0.0",
@@ -21,7 +22,8 @@
     "vue-router": "^3.0.3",
     "vue-schart": "^2.0.0",
     "vuedraggable": "^2.17.0",
-    "vuex": "^3.5.1"
+    "vuex": "^3.5.1",
+    "wangeditor": "^4.0.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",

@@ -33,7 +33,7 @@
                 </div>
             </div>
         
-            <el-dialog title="裁剪图片" :visible.sync="dialogVisible" width="30%">
+            <el-dialog :close-on-click-modal="false" title="裁剪图片" :visible.sync="dialogVisible" width="30%">
                 <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="cancelCrop">取 消</el-button>

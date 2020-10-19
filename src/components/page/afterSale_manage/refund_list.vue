@@ -3,7 +3,7 @@
 	<div>
 		<div class="container">
 			<div class="handle-box flex flex_item_between">
-				<el-form ref="form" :model="form" class="flex flex-wrap" label-width="80px">
+				<el-form ref="form" :model="form" class="flex flex_wrap" label-width="80px">
 					<el-form-item label="订单ID">
 						<el-input v-model="form.name" placeholder="输入订单ID" class="handle-input mr10"></el-input>
 					</el-form-item>
@@ -11,7 +11,7 @@
 						<el-input v-model="form.name" placeholder="输入订单ID" class="handle-input mr10"></el-input>
 					</el-form-item>
 					<el-form-item label="退款状态">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="form.one" placeholder="默认" class="handle-select mr10">
 								<el-option key="bbk" label="步步高" value="bbk"></el-option>
 								<el-option key="xtc" label="小天才" value="xtc"></el-option>
@@ -32,7 +32,7 @@
 					</el-form-item>
 					
 					<el-form-item label="申请类型">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="form.one" placeholder="默认" class="handle-select mr10">
 								<el-option key="bbk" label="步步高" value="bbk"></el-option>
 								<el-option key="xtc" label="小天才" value="xtc"></el-option>
@@ -41,7 +41,7 @@
 						</div>
 					</el-form-item>
 					<el-form-item label="理由类型">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="form.one" placeholder="默认" class="handle-select mr10">
 								<el-option key="bbk" label="步步高" value="bbk"></el-option>
 								<el-option key="xtc" label="小天才" value="xtc"></el-option>
@@ -50,9 +50,9 @@
 						</div>
 					</el-form-item>
 				</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
 			</div>
 			
 			<el-table height="600" :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header"
@@ -82,8 +82,12 @@
 	import {
 		fetchData
 	} from '../../../api/index';
+	import { mapState } from 'vuex'
 	export default {
 		name: 'Inventory_change',
+		computed:{
+		     ...mapState(['accountId']),  //显示state的数据
+		    },
 		data() {
 			return {
 				query: {
@@ -136,6 +140,7 @@
 					})
 					.then(() => {
 						this.$message.success('删除成功');
+						this.getData();
 						this.tableData.splice(index, 1);
 					})
 					.catch(() => {});

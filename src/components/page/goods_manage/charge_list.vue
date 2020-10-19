@@ -3,12 +3,12 @@
 	<div>
 		<div class="container">
 			<div class="handle-box flex flex_item_between">
-				<el-form ref="searchForm" :model="searchForm" class="flex flex-wrap" label-width="80px">
+				<el-form ref="searchForm" :model="searchForm" class="flex flex_wrap" label-width="80px">
 					<el-form-item label="项目">
 						<el-input v-model="searchForm.name" placeholder="输入产品名称/ID" class="handle-input mr10"></el-input>
 					</el-form-item>
 					<el-form-item label="项目类型">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="searchForm.typeStr" placeholder="默认" @change="typeCil" class="handle-select mr10">
 								<el-option
 								  v-for="(item,index) in searchForm.typeList"
@@ -28,7 +28,7 @@
 						</div>
 					</el-form-item>
 					<el-form-item label="费用类型">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="searchForm.expenseTypeStr" @change="expenseTypeCil" placeholder="默认" class="handle-select mr10">
 								<el-option key="1" label="增加" value="1"></el-option>
 								<el-option key="2" label="减少" value="2"></el-option>
@@ -37,7 +37,7 @@
 
 					</el-form-item>
 					<el-form-item label="展示类型">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="searchForm.showTypeStr" placeholder="默认" @change="showTypeCil" class="handle-select mr10">
 								<el-option key="1" label="数量型" value="1"></el-option>
 								<el-option key="2" label="开头型" value="2"></el-option>
@@ -45,13 +45,13 @@
 						</div>
 					</el-form-item>
 				</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
 			</div>
 			<div class="handle-box">
 				<el-button type="primary" @click="handleAdd">添加</el-button>
-				<el-button type="info">删除</el-button>
+				<!-- <el-button type="info">删除</el-button> -->
 			</div>
 			<el-table height="550" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
 			 @selection-change="handleSelectionChange">
@@ -109,7 +109,7 @@
 			</div>
 		</div>
 
-		<el-dialog title="添加项目" :visible.sync="dialogVisible" width="30%">
+		<el-dialog :close-on-click-modal="false" title="添加项目" :visible.sync="dialogVisible" width="30%">
 			<div>
 				<div class="handle-box">
 					<el-form ref="form" :model="form" label-width="80px">
@@ -137,7 +137,7 @@
 							</div>
 						</el-form-item>
 						<el-form-item label="项目费用">
-							<el-input v-model="form.price" placeholder="输入项目费用"></el-input>
+							<el-input type="number" v-model="form.price" placeholder="输入项目费用"></el-input>
 						</el-form-item>
 						<el-form-item label="费用类型">
 							<div>
@@ -195,8 +195,12 @@
 		updShopExpenseItem
 	} from '../../../api/index';
 	import select from '../../../../public/select.json'
+	import { mapState } from 'vuex'
 	export default {
 		name: 'Inventory_change',
+		computed:{
+		     ...mapState(['accountId']),  //显示state的数据
+		    },
 		data() {
 			return {
 				page:1,
@@ -204,7 +208,7 @@
 				tableData: [],
 				searchForm:{
 					// accountId:localStorage.getItem('account_id'),
-					accountId:1596621041,
+					// accountId:this.accountId,
 					name:'',
 					type:0,
 					typeStr:'',
@@ -221,7 +225,7 @@
 					status:'',
 					shopExpenseItemId:'',
 					// accountId:localStorage.getItem('account_id'),
-					accountId:1596621041,
+					// accountId:this.accountId,
 					name:'',
 					type:0,
 					typeStr:'',
@@ -265,10 +269,38 @@
 			//添加请求
 			addCharge(){
 				var item = this.form;
+				if(item.name == ''){
+					this.$message.error('请输入项目名称');
+					return
+				}
+				if(item.type == 0){
+					this.$message.error('请选择项目类型');
+					return
+				}
+				if(item.price == ''){
+					this.$message.error('请输入项目费用');
+					return
+				}
+				if(item.expenseType == 0){
+					this.$message.error('请选择费用类型');
+					return
+				}
+				if(item.linkNum == 0){
+					this.$message.error('请选择是否关联数量');
+					return
+				}
+				if(item.showType == 0){
+					this.$message.error('请选择展示类型');
+					return
+				}
+				if(item.sortNum < 0 || item.price < 0){
+					this.$message.error("禁止输入负数");
+					return;
+				}
 				var query = {
 					data:{
 						// accountId:localStorage.getItem('account_id'),
-						accountId:1596621041,
+						accountId:this.accountId,
 						name:item.name,
 						type:item.type,
 						sort:item.sortNum,
@@ -288,6 +320,10 @@
 			},
 			//编辑请求
 			editCharge(){
+				if(item.sortNum < 0 || item.price < 0){
+					this.$message.error("禁止输入负数");
+					return;
+				}
 				var item = this.form;
 				var query = {
 					data:{
@@ -435,7 +471,7 @@
 				var item = this.searchForm;
 				var query = {
 					data:{
-						accountId:item.accountId,
+						accountId:this.accountId,
 						name:item.name,
 						type:item.type,
 						sort:item.sortNum,  		 
@@ -476,7 +512,8 @@
 						delShopExpenseItem(query).then(res => {
 							if(res.code == 1){
 								this.$message.success('删除成功');
-								this.tableData.data.splice(index, 1);
+								this.getData();
+								// this.tableData.data.splice(index, 1);
 							}
 						});
 					})

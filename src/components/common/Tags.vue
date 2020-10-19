@@ -24,12 +24,20 @@
 
 <script>
     import bus from './bus';
+	import util from '../../utils/util.js'
     export default {
         data() {
             return {
                 tagsList: []
             }
         },
+		mounted(){
+		      var that = this;
+		      util.$on('demo', function (msg) {
+		        // console.log(msg);
+		        that.closeOther();
+		      })
+		    },
         methods: {
             isActive(path) {
                 return path === this.$route.fullPath;

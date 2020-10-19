@@ -155,6 +155,15 @@ a {
 .el-upload--text em {
 	font-style: normal;
 }
+.el-step__head {
+    width: 118% !important;
+}
+.el-step.is-horizontal .el-step__line {
+    left: 20px !important;
+}
+.el-step__icon{
+	left: 17px !important;
+}
 
 /*VueEditor*/
 

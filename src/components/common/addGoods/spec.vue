@@ -1,20 +1,20 @@
 <template>
 	<div class="spec">
 		<div class="head_t">
-			{{specList.title}}
+			{{specList.shopWaresSpec.specName}}
 		</div>
-		<div class="middle_s flex flex_wrap" v-if="specList.attr">
-			<div class="tab" v-for="item in specList.attr" :class="{'active':subIndex==item.data}">
-				<span @click="sub1(1,item)">{{item.data}}</span>
+		<div class="middle_s flex flex_wrap">
+			<div class="tab" v-for="item in specList.shopWaresSpec.shopWaresSpecItems" :class="{'active':subIndex==item.name}">
+				<span @click="sub1(1,item)">{{item.name}}</span>
 			</div>
 		</div>
-		<div v-if="specChild">
+		<div v-if="specChild != ''">
 			<div class="head_t">
-				{{specChild.title}}
+				{{specChild[0].type}}
 			</div>
-			<div class="middle_s flex flex_wrap" v-if="specChild.attr">
-				<div class="tab" v-for="item in specChild.attr" :class="{'active':subIndex2==item.data}">
-					<span @click="sub1(2,item)">{{item.data}}</span>
+			<div class="middle_s flex flex_wrap">
+				<div class="tab" v-for="item in specChild" :class="{'active':subIndex2==item.name}">
+					<span @click="sub1(2,item)">{{item.name}}</span>
 				</div>
 			</div>
 		</div>
@@ -24,7 +24,7 @@
 <script>
 	export default {
 		name: 'info',
-		props: ['specList', 'specTitle'],
+		props: ['specList'],
 		data() {
 			return {
 				selectArr: [], //存放被选中的值
@@ -40,54 +40,43 @@
 				var item = {};
 				item.sub = [
 					{
-						tittle: this.specList.title,
+						tittle: this.specList.shopWaresSpec.specName,
 					}
 				]
 				if(type == 1){
-					this.subIndex = data.data;
+					// console.log(111)
+					this.subIndex = data.name;
+					// console.log(this.subIndex)
 					this.subIndex2 = '';
 					var items = {
-						tt:data.data
+						tt:data.name
 					}
 					// item.sub[0].push(items)
 					Object.assign(item.sub[0],items);
-					this.$emit('transferUser',item);
+					this.$emit('transferUser',item,data);
 					// this.ferUser(item)
-					if (data.child) {
-						this.specChild = data.child
+					if (data.shopWaresSpecItemItems) {
+						this.specChild = data.shopWaresSpecItemItems
 					} else {
 						this.specChild = '';
 					}
+					// console.log(this.specChild)
 				}else if(type == 2){
-					this.subIndex2 = data.data;
+					this.subIndex2 = data.name;
 					var items = {
 						tt:this.subIndex
 					}
 					Object.assign(item.sub[0],items);
 					var itemss = {
 						datas:[{
-							ss:data.data
+							ss:data.name
 						}]
 					}
 					Object.assign(item.sub[0],itemss);
-					this.$emit('transferUser',item);
+					this.$emit('transferUser',item,data);
 					// this.ferUser(item)	
 				}
-			},
-			// ferUser(data) {
-			// 	console.log(JSON.stringify(data.sub[0].tittle))
-			// 	var narA = this.selectArr;
-			// 	console.log(JSON.stringify(this.selectArr))
-			// 	narA.map((item, index) => {
-			// 		if (item.tittle == data.sub[0].tittle) {
-			// 			alert("重复")
-			// 			narA.splice(index, 1)
-			// 		}
-			// 	})
-			// 	narA.push(data.sub[0])
-			// 	this.$emit('transferUser',narA);
-				
-			// },
+			}
 		}
 	}
 </script>

@@ -6,7 +6,19 @@ Vue.use(Vuex)
 export default new Vuex.Store({
 	state:{
 		imgUrl:'http://192.168.0.222:8080/img/', //图片地址
-		count:0
+		// imgUrl:' http://127.0.0.1:8080/zhc_war/img/', //图片地址
+		// imgUrl:'http://101.37.204.197/zhc_war/img/', //图片地址
+		imgStr:'http://192.168.0.222:8080/api/uploadImg',  //图片接口
+		// imgStr:' http://127.0.0.1:8080/zhc_war/api/uploadImg',  //图片接口
+		// imgStr:'http://101.37.204.197/zhc_war/api/uploadImg', //图片接口
+		
+		count:0,
+		// accountId:localStorage.getItem('account_id'),
+		accountId: "1596621041",
+		// msUsername:localStorage.getItem('ms_username'),
+		msUsername: '呵呵',
+		
+		list:[]
 	},
 	getters:{
 		//Getter不会修改state内的原数据，而会进行加工形成新数据

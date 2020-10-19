@@ -84,7 +84,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog :close-on-click-modal="false" title="编辑" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="70px">
                 <el-form-item label="用户名">
                     <el-input v-model="form.name"></el-input>
@@ -148,6 +148,7 @@ export default {
             })
                 .then(() => {
                     this.$message.success('删除成功');
+					this.getData();
                     this.tableData.splice(index, 1);
                 })
                 .catch(() => {});

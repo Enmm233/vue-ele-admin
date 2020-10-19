@@ -11,16 +11,16 @@
 						<div class="list">
 							<div class="item flex">
 								<div class="left">商品ID：</div>
-								<div class="right">454812</div>
+								<div class="right">{{goodsInfo.id}}</div>
 							</div>
 							<div class="item flex">
 								<div class="left">商品名称：</div>
-								<div class="right">454812</div>
+								<div class="right">{{goodsInfo.waresName}}</div>
 							</div>
 							<div class="item flex">
 								<div class="left">缩略图片：</div>
 								<div class="right flex flex_wrap">
-									<el-image style="width: 100px; height: 100px" :src="url" :preview-src-list="srcList">
+									<el-image style="width: 100px; height: 100px" :src="imgUrl+goodsInfo.waresThumbnail" @click.stop="handleClickItem" :preview-src-list="[imgUrl+goodsInfo.waresThumbnail]">
 									</el-image>
 								</div>
 							</div>
@@ -28,46 +28,44 @@
 								<div class="left">商品图片：</div>
 								<div class="right flex flex_wrap">
 									<div class="marginR10 marginB10" v-for="item in srcList">
-										<el-image style="width: 100px; height: 100px" :src="item" :preview-src-list="srcList">
+										<el-image style="width: 100px; height: 100px" :src="item" @click.stop="handleClickItem" :preview-src-list="srcList">
 										</el-image>
 									</div>
-	
 								</div>
 							</div>
 							<div class="item flex">
 								<div class="left">标签文字：</div>
 								<div class="right">
-									<el-tag>标签一</el-tag>
-									<el-tag>标签一</el-tag>
-									<el-tag>标签一</el-tag>
+									<el-tag v-for="item in waresLabel">{{item}}</el-tag>
 								</div>
 							</div>
 							<div class="item flex">
 								<div class="left">销售价格：</div>
-								<div class="right">¥59.00</div>
+								<div class="right">¥{{goodsInfo.price}}</div>
 							</div>
 							<div class="item flex">
 								<div class="left">商品原价：</div>
-								<div class="right">¥59.00</div>
+								<div class="right">¥{{goodsInfo.price}}</div>
 							</div>
 							<div class="item flex">
 								<div class="left">上架状态：</div>
-								<div class="right">已上架</div>
+								<div class="right" v-if="goodsInfo.saleState == 1">已上架</div>
+								<div class="right" v-if="goodsInfo.saleState == 2">未上架</div>
+								<div class="right" v-if="goodsInfo.saleState == 3">已下架</div>
 							</div>
 							<div class="item flex">
 								<div class="left">销售数量：</div>
-								<div class="right">¥59.00</div>
+								<div class="right">{{goodsInfo.stockNumber}}</div>
 							</div>
 							<div class="item flex">
 								<div class="left">商品分类：</div>
-								<div class="right">加工食品--糕点--月饼</div>
+								<div class="right">{{goodsInfo.categoryName}}</div>
 							</div>
 							<div class="item flex">
 								<div class="left">商品性质：</div>
-								<div class="right">产品</div>
+								<div class="right" v-if="goodsInfo.waresType == 1">物品</div>
+								<div class="right" v-if="goodsInfo.waresType == 2">服务</div>
 							</div>
-	
-	
 						</div>
 					</div>
 				</el-col>
@@ -81,44 +79,72 @@
 	
 							<div class="item flex">
 								<div class="leftt">产品/服务名称：</div>
-								<div class="rightt">五香月饼</div>
+								<div class="rightt">{{goodsInfo.serviceName}}</div>
 							</div>
-							<div class="item flex">
+						<!-- 	<div class="item flex">
 								<div class="leftt">品牌名及图标：</div>
 								<div class="rightt">乔家栅</div>
-							</div>
-							<div class="item flex">
+							</div> -->
+						<!-- 	<div class="item flex">
 								<div class="leftt">服务清单列表：</div>
 								<div class="rightt">
-									<p>提供上门接送服务</p>
-									<p>提供早中晚餐</p>
-									<p>提供景点门票</p>
-									<p>提供缆车接送</p>
-									<p>提供游船船票</p>
+									<p v-for="item in goodsInfo.shopExpenseItems">{{item.name}}</p>
 								</div>
-							</div>
+							</div> -->
 							<div class="item flex">
 								<div class="leftt">赠号名称：</div>
 								<div class="rightt">
-									精美包装袋、月饼切块工具、月饼
-									托盘、手套三对
+									<span v-for="item in goodsInfo.shopGifts">{{item.giftName}}、</span>
 								</div>
 							</div>
 							<div class="item flex">
 								<div class="leftt">附加收费：</div>
 								<div class="rightt">
-									运费险10元、南昌本地户口减5元、
-									服务费3元
+									<span v-for="item in goodsInfo.shopExpenseItems">{{item.name}}、</span>
 								</div>
 							</div>
 							<div class="item flex">
 								<div class="leftt">适用活动：</div>
 								<div class="rightt">
-									中秋全民团圆全平台月饼8折优惠、
-									乔家栅为回馈新老客户中秋节当天
-									95折优惠、平台消费满500元减10
-									元。
+									<span v-for="item in goodsInfo.shopActivity">{{item.activityTitle}}、</span>
 								</div>
+							</div>
+							<div class="item flex">
+								<div class="leftt">商品规格：</div>
+								<div class="rightt">
+									
+								</div>
+							</div>
+							<div class="item flex">
+								<!-- <div class="rightt"> -->
+									<div style="width: 100%;">
+										<div class="conten spec">
+											<div class="spec_right">
+												<div v-for="(item,index) in goodsInfo.data">
+													<div class="f_item flex flex_item_mid">
+														<div class="left">{{item.shopWaresSpec.specName}}</div>
+													</div>
+													<div v-if="item.shopWaresSpec.shopWaresSpecItems != []">
+														<div v-for="(item2,index2) in item.shopWaresSpec.shopWaresSpecItems">
+															<div class="f_item flex flex_item_between">
+																<div class="left paddingL15">{{item2.name}}</div>
+															</div>
+															<div v-if="item2.shopWaresSpecItemItems != []">
+																<div v-for="(item3,index3) in item2.shopWaresSpecItemItems">
+																	<div class="f_item flex flex_item_between">
+																		<div class="left paddingL30">{{item3.name}}</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									
+
+								<!-- </div> -->
 							</div>
 	
 						</div>
@@ -130,8 +156,9 @@
 							<div class="xian"></div>
 							<div>图文详情</div>
 						</div>
-						<div class="list overflow-scroll-y">
-							<section id="s-desc"><p><img src="//img.alicdn.com/imgextra/i2/2238534341/O1CN01xKeXzY1hwDsyYEEtj_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i4/2238534341/O1CN01PUv93s1hwDsvk3Jmg_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i1/2238534341/O1CN01txuVmj1hwDswuFukr_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i4/2238534341/O1CN011LAwU11hwDt2lz0Hk_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i2/2238534341/O1CN01RrdXkq1hwDsyYDpyE_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i3/2238534341/O1CN01NhuBko1hwDsyG7DIm_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i3/2238534341/O1CN01AkS5Oh1hwDsyG7Lb5_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i1/2238534341/O1CN01f83hYf1hwDsvk06BX_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i3/2238534341/O1CN01eI2eKF1hwDsz1U9a3_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i1/2238534341/O1CN01PEQBsz1hwDt2IuAw0_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img.alicdn.com/imgextra/i1/2238534341/O1CN01qPDlNU1hwDt2IxKMO_!!2238534341.gif" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i3/2238534341/O1CN01k82QCI1hwDswuEVRh_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01eCMxXH1hwDsz1UDjn_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i2/2238534341/O1CN01WRI6ff1hwDt0Kq28B_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i2/2238534341/O1CN01S7Pw3b1hwDt0Kq28N_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01YS0NcR1hwDswh6dDy_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i4/2238534341/O1CN01Qy20QQ1hwDt2lxfBf_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i3/2238534341/O1CN016sY9vD1hwDsz1Ss2x_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01yRz1Ro1hwDsvk2z1w_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN019ztw921hwDt2IuVjl_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01HrazbU1hwDt1FUVoT_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i3/2238534341/O1CN01fNpHgH1hwDsyYE6eX_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i4/2238534341/O1CN01R3V3Lc1hwDsr5Z6tz_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i2/2238534341/O1CN019c7kaq1hwDt2lzfv0_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01TDE3uw1hwDsz1SnuS_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i4/2238534341/O1CN01JZwuNe1hwDswuEJ26_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i2/2238534341/O1CN01OgutBm1hwDt1nQNEI_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01BS9tKK1hwDsr5ZqcK_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i1/2238534341/O1CN01TsTrz81hwDsr5a34U_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i2/2238534341/O1CN01gS5tRV1hwDt2Iweon_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"><img src="//img-tmdetail.alicdn.com/tps/i3/T1BYd_XwFcXXb9RTPq-90-90.png" data-ks-lazyload="//img.alicdn.com/imgextra/i3/2238534341/O1CN01vApBOs1hwDsvk0Mrm_!!2238534341.jpg_2200x2200Q90s50.jpg_.webp" align="absmiddle"> </p></section>
+						<div class="list describe overflow-scroll-y">
+							<div v-html="goodsInfo.webDescribe"></div>
+							<!-- {{goodsInfo.webDescribe}} -->
 						</div>
 					</div>
 				</el-col>
@@ -141,24 +168,69 @@
 </template>
 
 <script>
+	import {
+		getShopWares
+	} from '../../../api/index';
+	import { mapState } from 'vuex'
 	export default {
 		name: 'goodsDetail',
+		computed:{
+		     ...mapState(['imgUrl','accountId']),  //显示state的数据
+		    },
+		props:["id"],
 		data() {
 			return {
-				url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
-				srcList: [
-					'https://fuss10.elemecdn.com/8/27/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg',
-					'https://fuss10.elemecdn.com/1/8e/aeffeb4de74e2fde4bd74fc7b4486jpeg.jpeg',
-					'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1600082408744&di=35a973d1bf38730e0d08b05367920394&imgtype=0&src=http%3A%2F%2Fi1.hdslb.com%2Fbfs%2Farchive%2Fe07fa2634c6fb29339c3cd052fbaac078b50e6c1.jpg',
-					'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1600082367356&di=23c8d9e754e3f4eb5885a73ee894e8fa&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201711%2F01%2F20171101005017_mZvNJ.thumb.700_0.jpeg',
-					'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1600082300057&di=3c051d850d2f2760976f76e25b19276f&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F5%2F58622d9d7e5b5.jpg',
-					'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1850043459,2555008889&fm=26&gp=0.jpg'
-				]
+				goodsInfo:'',
+				// url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+				srcList: [],
+				waresLabel: []
 			};
 		},
+		watch:{
+			"id":function(){
+				// console.log(this.id)
+				this.getData()
+			}
+		},
 		created() {
+			// console.log(this.id)
+			this.getData()
 		},
 		methods: {
+			handleClickItem() {
+				// 获取遮罩层dom
+				var domImageMask = '';
+				var time = setTimeout(function() {
+					domImageMask = document.querySelector(".el-image-viewer__mask");
+					if (!domImageMask) {
+						return;
+					}
+					domImageMask.addEventListener("click", () => {
+						// 点击遮罩层时调用关闭按钮的 click 事件
+						document.querySelector(".el-image-viewer__close").click();
+						clearTimeout(time);
+					});
+				}, 100)
+			},
+			getData() {
+				this.srcList = [];
+				var query = {
+					data: {
+						waresId: this.id,
+					}
+				};
+				getShopWares(query).then(res => {
+					if (res.code == 1) {
+						this.goodsInfo = res.data; 
+						var arr = res.data.waresImg.split(',');
+						for(var i=0;i<arr.length;i++){
+							this.srcList.push(this.imgUrl+arr[i])
+						}
+						this.waresLabel = res.data.waresLabel.split(',');
+						
+					}
+				});
+			},
 			
 		}
 	};
@@ -169,4 +241,32 @@
 		margin-right: 10px;
 		margin-top: -5px;
 	}
+	.spec .spec_right {
+		border: 1px solid #EBEEF5;
+		cursor: pointer;
+		font-size: 13px;
+		font-weight: 500;
+		color: #303133;
+		margin-top: 0 !important;
+		height: 400px !important;
+		overflow: hidden;
+		overflow-y: scroll;
+	}
+	
+	.spec .spec_right .f_item {
+		padding: 10px 20px;
+		border-bottom: 1px solid #EBEEF5;
+	}
+	
+	.spec .spec_right .f_item .right i {
+		margin-left: 10px;
+	}
+	
+	.goods_list .detail_box .con_body .list .item .left {
+	    width: 100%;
+	    text-align: start;
+	    font-size: 15px;
+	    font-weight: 600;
+	}
+	
 </style>

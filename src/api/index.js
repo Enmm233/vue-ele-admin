@@ -21,9 +21,16 @@ export const codeLogin = query => {
         params: query
     });
 };
+export const signOut = query => {
+    return request({  //退出登录
+        url: '/api/user/signOut',
+        method: 'post',
+        params: query
+    });
+};
 export const shopProductCategoryt = query => {
     return request({  //获取产品分类
-        url: '/api/shop/shop_product_category',
+        url: '/api/merchant/get_shopProduccategory_byParent',
         method: 'post',
         params: query
     });
@@ -155,4 +162,163 @@ export const addShopWarehousing = query => {
         params: query
     });
 };
+export const listShopActivity = query => {
+    return request({  //活动列表
+        url: '/api/merchant/list_shopActivity',
+        method: 'post',
+        params: query
+    });
+};
+export const addShopWaresInfo = query => {
+    return request({  //新增商品
+        url: '/api/merchant/add_shopWares_info',
+        method: 'post',
+        params: query
+    });
+};
+export const getShopWares = query => {
+    return request({  //获取商品详情
+        url: '/api/merchant/get_shopWares',
+        method: 'post',
+        params: query
+    });
+};
+export const updShopWaresInfo = query => {
+    return request({  //修改商品
+        url: '/api/merchant/upd_shopWares_info',
+        method: 'post',
+        params: query
+    });
+};
+export const ceaseSale = query => {
+    return request({  //下架商品
+        url: '/api/merchant/ceaseSale',
+        method: 'post',
+        params: query
+    });
+};
+export const sale = query => {
+    return request({  //上架商品
+        url: '/api/merchant/sale',
+        method: 'post',
+        params: query
+    });
+};
+
+export const delShopWares = query => {
+    return request({  //删除商品
+        url: '/api/merchant/delShopWares',
+        method: 'post',
+        params: query
+    });
+};
+
+export const listShopWaresComment = query => {
+    return request({  //商品评论列表
+        url: '/api/shop/list_shop_wares_comment',
+        method: 'post',
+        params: query
+    });
+};
+
+export const getStoreByUserId = query => {
+    return request({  //获取商铺信息
+        url: '/api/merchant/getStoreByUserId',
+        method: 'post',
+        params: query
+    });
+};
+export const getShopStoreCategory = query => {
+    return request({  //店铺分类
+        url: '/api/merchant/getShopStoreCategory',
+        method: 'post',
+        params: query
+    });
+};
+export const updStore = query => {
+    return request({  //编辑商铺信息
+        url: '/api/merchant/updStore',
+        method: 'post',
+        params: query
+    });
+};
+export const insertShopWaresCommenreply = query => {
+    return request({  //新增商品评论回复
+        url: '/api/merchant/insertShopWaresCommenreply',
+        method: 'post',
+        params: query
+    });
+};
+
+export const listWaresOrder = query => {
+    return request({  //商品订单列表
+        url: '/api/merchant/listWaresOrder',
+        method: 'post',
+        params: query
+    });
+};
+
+export const waresOrderDetails = query => {
+    return request({  //订单详情
+        url: '/api/merchant/waresOrderDetails',
+        method: 'post',
+        params: query
+    });
+};
+
+export const deliverGoods = query => {
+    return request({  //订单发货
+        url: '/api/merchant/deliverGoods',
+        method: 'post',
+        params: query
+    });
+};
+
+export const updShopProduct = query => {
+    return request({  //修改产品信息
+        url: '/api/merchant/upd_shopProduct',
+        method: 'post',
+        params: query
+    });
+};
+
+export const listShopService = query => {
+    return request({  //服务信息列表
+        url: '/api/merchant/list_shopService',
+        method: 'post',
+        params: query
+    });
+};
+
+export const selShopService = query => {
+    return request({  //服务信息详情
+        url: '/api/merchant/sel_shopService',
+        method: 'post',
+        params: query
+    });
+};
+export const delShopService = query => {
+    return request({  //删除服务信息
+        url: '/api/merchant/del_shopService',
+        method: 'post',
+        params: query
+    });
+};
+
+export const addShopService = query => {
+    return request({  //新增服务信息
+        url: '/api/merchant/add_shopService',
+        method: 'post',
+        params: query
+    });
+};
+
+export const getMerchandiseCategories = query => {
+    return request({  //服务分类
+        url: 'api/index/get_merchandise_categories',
+        method: 'post',
+        params: query
+    });
+};
+
 

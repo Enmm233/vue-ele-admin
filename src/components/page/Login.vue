@@ -56,6 +56,7 @@
 
 <script>
 	import { doSendCode,codeLogin } from '../../api/index';
+	import { mapState } from 'vuex'
 	export default {
 		data: function() {
 			return {
@@ -147,7 +148,8 @@
 						verification_code:this.param.verification_code,
 						platform:5,
 						MEID:'',
-						invicode:''
+						invicode:'',
+						platformType:1
 					}
 				};
 				codeLogin(query).then(res => {
@@ -155,7 +157,8 @@
 						this.$message.success('登录成功');
 						localStorage.setItem('ms_username', res.data.userBaseInfo.nickName);
 						localStorage.setItem('account_id', res.data.userAccount.id);
-						this.$router.push('/');
+						localStorage.setItem('login_id', res.data.userAccount.loginId);
+						this.$router.push('/product_list');
 					}
 				});
 			},

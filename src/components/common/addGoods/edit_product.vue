@@ -1,24 +1,24 @@
 <template>
 	<div class="add_p">
 		<div>
-			<el-form :model="ruleForm" :rules="rules" label-width="100px" class="demo-ruleForm flex">
+			<el-form :model="ruleForm" label-width="100px" class="demo-ruleForm flex">
 				<div class="form-box">
-					<el-form-item label="产品名称" prop="name" class="big-input">
+					<el-form-item label="产品名称" class="big-input">
 						<el-input v-model="ruleForm.name" placeholder="请输入产品名称"></el-input>
 					</el-form-item>
-					<el-form-item label="产品大类" prop="classifyOneName">
+					<el-form-item label="产品大类">
 						<el-select v-model="ruleForm.classifyOneName" @change="selectOne" placeholder="请选择">
 							<el-option v-for="(item,index) in ruleForm.classifyOne" :key="item.id" :label="item.name" :value="index">
 							</el-option>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="产品二类" prop="classifyTwoName">
+					<el-form-item label="产品二类">
 						<el-select v-model="ruleForm.classifyTwoName" @change="selectTwo" placeholder="请选择">
 							<el-option v-for="(item,index) in ruleForm.classifyTwo" :key="item.id" :label="item.name" :value="index">
 							</el-option>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="产品三类" prop="classifyThreeName">
+					<el-form-item label="产品三类">
 						<el-select v-model="ruleForm.classifyThreeName" @change="selectThree" placeholder="请选择">
 							<el-option v-for="(item,index) in ruleForm.classifyThree" :key="item.id" :label="item.name" :value="index">
 							</el-option>
@@ -27,9 +27,17 @@
 
 					<el-form-item label="产品图片">
 						<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:300*300像素，最多1张</div>
-						<el-upload action="http://192.168.0.222:8080/api/uploadImg" :data="query" list-type="picture-card" :limit="1"
-						 :on-success="productSuccess" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleProductPreview"
-						 :on-remove="productRemove">
+						<el-upload 
+						:action="imgStr" 
+						:data="query" 
+						list-type="picture-card" 
+						:limit="1" 
+						:on-success="productSuccess"
+						 :before-upload="beforeAvatarUpload" 
+						 :on-exceed="handleExceed" 
+						 :on-preview="handleProductPreview" 
+						 :on-remove="productRemove"
+						 :file-list="productList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showProductImg" append-to-body>
@@ -38,9 +46,9 @@
 					</el-form-item>
 					<el-form-item label="品牌图片">
 						<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:300*300像素，最多1张</div>
-						<el-upload action="http://192.168.0.222:8080/api/uploadImg" :data="query" list-type="picture-card" :limit="1"
-						 :on-success="brandSuccess" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleBrandPreview"
-						 :on-remove="brandRemove">
+						<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1" :on-success="brandSuccess"
+						 :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleBrandPreview" :on-remove="brandRemove"
+						 :file-list="brandList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showBrandImg" append-to-body>
@@ -49,9 +57,9 @@
 					</el-form-item>
 
 				</div>
-				
+
 				<div class="form-box add_form">
-					
+
 					<el-form-item label="品牌名称" class="big-input">
 						<el-input v-model="ruleForm.brand" placeholder="请输入品牌名称"></el-input>
 					</el-form-item>
@@ -96,26 +104,32 @@
 	import {
 		shopProductCategoryt,
 		upLoadImg,
-		addShopProduct,
-		getShopProduct
+		getShopProduct,
+		updShopProduct
 	} from '../../../api/index.js';
 	import select from '../../../../public/select.json'
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		name: 'info',
-		computed:{
-			...mapState(['imgUrl']),  //显示state的数据
+		computed: {
+			...mapState(['imgUrl', 'accountId', 'imgStr']), //显示state的数据
 		},
-		props: ['shopProductId','addProduct'],
+		props: ['shopProductId', 'editProduct'],
 		data() {
 			return {
 				productImg: '', //预览产品图片路径
 				productUrl: '', //后台返回的产品图片路径
+				productList: [],
 				showProductImg: false, //是否显示产品图片预览
 
 				brandImg: '', //预览品牌图片路径
 				brandUrl: '', //后台返回的品牌图片路径
+				brandList: [],
 				showBrandImg: false, //是否显示品牌图片预览
+				
+				delImgs:[],
 				query: { //上传图片固定参数
 					data: "{'flag': '3'}"
 				},
@@ -139,42 +153,13 @@
 					instructions: '', //使用说明
 					composition: '', //产品成分
 					dangerAlert: '', //注意事项
-					// createUserId:localStorage.getItem('account_id'),
-					createUserId: 1596621041, // 创建用户编号
-				},
-				rules: {
-					name: [{
-							required: true,
-							message: '请输入产品名称',
-							trigger: 'blur'
-						},
-						{
-							min: 2,
-							max: 5,
-							message: '长度在 2 到 5 个字符',
-							trigger: 'blur'
-						}
-					],
-					classifyOneName: [{
-						required: true,
-						message: '请选择分类',
-						trigger: 'change'
-					}],
-					classifyTwoName: [{
-						required: true,
-						message: '请选择分类',
-						trigger: 'change'
-					}],
-					classifyThreeName: [{
-						required: true,
-						message: '请选择分类',
-						trigger: 'change'
-					}]
 				}
 			};
 		},
-		created() {
+		mounted() {
 			this.productCategory()
+			this.getProduct(this.shopProductId)
+			
 		},
 		methods: {
 			productSuccess(res, file) { //产品图片上传成功
@@ -185,6 +170,7 @@
 				this.showProductImg = true;
 			},
 			productRemove(file, fileList) { //产品图片删除
+				this.delImgs.push(file.url)
 				this.productUrl = '';
 			},
 
@@ -196,6 +182,7 @@
 				this.showBrandImg = true;
 			},
 			brandRemove(file, fileList) { //品牌图片删除
+				this.delImgs.push(file.url)
 				this.brandUrl = '';
 			},
 			beforeAvatarUpload(file) {
@@ -209,16 +196,17 @@
 			handleExceed(files, fileList) {
 				this.$message.warning(`上传文件超出限制`);
 			},
-			submitForm() { //确认添加
-				console.log(this.ruleForm)
+			submitForm() { //确认修改
+				// console.log(this.ruleForm)
 				var form = this.ruleForm;
 				var query = {
 					data: {
+						id:this.shopProductId,
 						name: form.name, //产品名称
 						brand: form.brand, //品牌
 						categoryId: form.classifyId, //分类ID
-						image: this.imgUrl+this.productUrl, //产品图片
-						brandLogo: this.imgUrl+this.brandUrl, //品牌图片
+						image: this.productUrl, //产品图片
+						brandLogo: this.brandUrl, //品牌图片
 						thumbnail: '', //缩略图
 						unit: form.unit, //单位
 						material: '', //制作材料
@@ -232,62 +220,178 @@
 						useEnvironment: form.useEnvironment, //储藏环境
 						instructions: form.instructions, //使用说明
 						dangerAlert: form.dangerAlert, //注意事项
-						createUserId: form.createUserId, //创建用户编号
+						delImgs: this.delImgs.toString(), //注意事项
 					}
 				};
-				addShopProduct(query).then(res => {
+				updShopProduct(query).then(res => {
 					if (res.code == 1) {
 						var data = {
 							type: "成功",
-							addProduct: this.addProduct
+							editProduct: this.editProduct
 						}
-						this.$emit('addProductCil', data);
+						this.$emit('editProductCil', data);
 					}
 				});
 			},
 			resetForm() { //取消添加
-				this.$confirm('此操作将清空输入内容, 是否继续?', '提示', {
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-					type: 'warning'
-				}).then(() => {
-					this.productImg = ''; //预览产品图片路径
-					this.productUrl = ''; //后台返回的产品图片路径
-					this.showProductImg = false; //是否显示产品图片预览
-
-					this.brandImg = ''; //预览品牌图片路径
-					this.brandUrl = ''; //后台返回的品牌图片路径
-					this.showBrandImg = false; //是否显示品牌图片预览
-					this.ruleForm = {
-						name: '', //产品名称
-						classifyId: 0, //分类ID
-						classifyOne: '', //分类一
-						classifyOneName: '',
-						classifyTwo: '', //分类二
-						classifyTwoName: '',
-						classifyThree: '', //分类三
-						classifyThreeName: '',
-						brand: '', //品牌名称
-						unit: '', //单位
-						unitList: select.unitList, //单位列表
-						validityTerm: '', //质保时长
-						placeOrigin: '', //产地
-						crowdSuits: '', //适合人群
-						useEnvironment: '', //储藏环境
-						instructions: '', //使用说明
-						composition: '', //产品成分
-						dangerAlert: '', //注意事项
-					};
-					var data = {
-						type: "取消",
-						addProduct: this.addProduct
+				this.productImg = ''; //预览产品图片路径
+				this.productUrl = ''; //后台返回的产品图片路径
+				this.productList = []; //后台返回的产品图片路径
+				this.showProductImg = false; //是否显示产品图片预览
+				this.brandImg = ''; //预览品牌图片路径
+				this.brandUrl = ''; //后台返回的品牌图片路径
+				this.brandList = []; //后台返回的品牌图片路径
+				this.delImgs = [];
+				this.showBrandImg = false; //是否显示品牌图片预览
+				this.ruleForm.name = '';
+				this.ruleForm.classifyId = 0;
+				this.ruleForm.classifyOne = '';
+				this.ruleForm.classifyOneName = '';
+				this.ruleForm.classifyTwo = '';
+				this.ruleForm.classifyTwoName = '';
+				this.ruleForm.classifyThree = '';
+				this.ruleForm.classifyThreeName = '';
+				this.ruleForm.brand = '';
+				this.ruleForm.unit = '';
+				this.ruleForm.validityTerm = '';
+				this.ruleForm.placeOrigin = '';
+				this.ruleForm.crowdSuits = '';
+				this.ruleForm.useEnvironment = '';
+				this.ruleForm.instructions = '';
+				this.ruleForm.composition = '';
+				this.ruleForm.dangerAlert = '';
+				var data = {
+					type: "取消",
+					editProduct: this.editProduct
+				}
+				this.$emit('editProductCil', data);
+			},
+			// 获取产品详情
+			getProduct(id) {
+				this.productList = []; //后台返回的产品图片路径
+				this.brandList = []; //后台返回的品牌图片路径
+				this.delImgs = [];
+				this.ruleForm.name = '';
+				this.ruleForm.classifyId = 0;
+				this.ruleForm.classifyOne = '';
+				this.ruleForm.classifyOneName = '';
+				this.ruleForm.classifyTwo = '';
+				this.ruleForm.classifyTwoName = '';
+				this.ruleForm.classifyThree = '';
+				this.ruleForm.classifyThreeName = '';
+				this.ruleForm.brand = '';
+				this.ruleForm.unit = '';
+				this.ruleForm.validityTerm = '';
+				this.ruleForm.placeOrigin = '';
+				this.ruleForm.crowdSuits = '';
+				this.ruleForm.useEnvironment = '';
+				this.ruleForm.instructions = '';
+				this.ruleForm.composition = '';
+				this.ruleForm.dangerAlert = '';
+				var query = {
+					data: {
+						shopProductId: id
 					}
-					this.$emit('addProductCil', data);
-				}).catch(() => {
-					this.$message({
-						type: 'info',
-						message: '已取消操作'
-					});
+				};
+				getShopProduct(query).then(res => {
+					if (res.code == 1) {
+							this.ruleForm.name = res.data.name; //产品名称
+							this.ruleForm.brand = res.data.brand; //品牌名称
+							this.ruleForm.unit = res.data.unit; //单位
+							this.ruleForm.validityTerm = res.data.validityTerm; //质保时长
+							this.ruleForm.placeOrigin = res.data.placeOrigin; //产地
+							this.ruleForm.crowdSuits = res.data.crowdSuits; //适合人群
+							this.ruleForm.useEnvironment = res.data.useEnvironment; //储藏环境
+							this.ruleForm.instructions = res.data.instructions; //使用说明
+							this.ruleForm.composition = res.data.composition; //产品成分
+							this.ruleForm.dangerAlert = res.data.dangerAlert; //注意事项
+						//一二级产品类型
+						if(!res.data.categoryIds && typeof(res.data.categoryIds)!='undefined' && res.data.categoryIds!=0){
+								this.productCategoryO("一级",res.data.categoryId,0);
+						}else{
+							var str = res.data.categoryId;
+							var arr = res.data.categoryIds.split(',');
+							
+							if(arr[0] == "0" && str != ''){
+								this.productCategoryO("一级",res.data.categoryId,0);
+							}
+							if(arr.length > 1){
+								this.productCategoryO("一级",arr[0],0);
+								this.productCategoryO("二级",arr[1],arr[0]);
+								if(str != ''){
+									this.productCategoryO("三级",res.data.categoryId,arr[1])
+								}
+							}
+						}
+						//产品图片
+						this.productImg = res.data.brandLogo;
+						var urlStr = res.data.brandLogo.split(',');
+						urlStr.forEach(item => {
+							let obj = new Object();
+							obj.url = this.imgUrl+item;
+							this.productList.push(obj);
+						});
+						//品牌图片
+						if (res.data.image) {
+							this.brandImg = res.data.image;
+							var urlStr = res.data.image.split(',');
+							urlStr.forEach(item => {
+								let obj = new Object();
+								obj.url = this.imgUrl+item;
+								this.brandList.push(obj);
+							});
+						}
+
+					}
+				});
+			},
+
+			// 获取产品分类
+			productCategoryO(type, screen, id) {
+				this.ruleForm.classifyId = 0;
+				this.ruleForm.classifyOne = '';
+				this.ruleForm.classifyOneName = '';
+				this.ruleForm.classifyTwo = '';
+				this.ruleForm.classifyTwoName = '';
+				this.ruleForm.classifyThree = '';
+				this.ruleForm.classifyThreeName = '';
+				var query = {
+					data: {
+						parentId: id
+					}
+				};
+				shopProductCategoryt(query).then(res => {
+					
+					if (res.code == 1) {
+						// console.log(res)
+						if (type == "一级") {
+							this.ruleForm.classifyOne = res.data
+							for (var i = 0; i < res.data.length; i++) {
+								if (res.data[i].id == screen) {
+									this.ruleForm.classifyOneName = res.data.[i].name;
+									this.ruleForm.classifyId = screen;
+								}
+							}
+						} else if (type == "二级") {
+							this.ruleForm.classifyTwo = res.data;
+							for (var i = 0; i < res.data.length; i++) {
+								if (res.data[i].id == screen) {
+									// console.log(res.data.[i])
+									this.ruleForm.classifyId = screen;
+									this.ruleForm.classifyTwoName = res.data.[i].name;
+								}
+							}
+						} else if (type == "三级") {
+							this.ruleForm.classifyThree = res.data;
+							for (var i = 0; i < res.data.length; i++) {
+								if (res.data[i].id == screen) {
+									// console.log(res.data.[i])
+									this.ruleForm.classifyId = screen;
+									this.ruleForm.classifyThreeName = res.data.[i].name;
+								}
+							}
+						}
+					}
 				});
 			},
 
@@ -295,7 +399,7 @@
 			productCategory() {
 				var query = {
 					data: {
-						waresType: 1
+						parentId: 0
 					}
 				};
 				shopProductCategoryt(query).then(res => {
@@ -305,18 +409,35 @@
 				});
 			},
 			selectOne(e) {
-				this.ruleForm.classifyId = this.ruleForm.classifyOne[e].id;
-				this.ruleForm.classifyTwo = this.ruleForm.classifyOne[e].list
+				var query = {
+					data: {
+						parentId: this.ruleForm.classifyOne[e].id
+					}
+				};
+				shopProductCategoryt(query).then(res => {
+					this.ruleForm.classifyId = this.ruleForm.classifyOne[e].id;
+					if (res.code == 1) {
+						this.ruleForm.classifyTwo = res.data
+					}
+				});
 			},
 			selectTwo(e) {
-				this.ruleForm.classifyId = this.ruleForm.classifyTwo[e].id;
-				this.ruleForm.classifyThree = this.ruleForm.classifyTwo[e].list;
+				console.log(this.ruleForm.classifyTwo[e].id)
+				var query = {
+					data: {
+						parentId: this.ruleForm.classifyTwo[e].id
+					}
+				};
+				shopProductCategoryt(query).then(res => {
+					this.ruleForm.classifyId = this.ruleForm.classifyTwo[e].id;
+					if (res.code == 1) {
+						this.ruleForm.classifyThree = res.data
+					}
+				});
 			},
 			selectThree(e) {
 				this.ruleForm.classifyId = this.ruleForm.classifyThree[e].id;
 			},
-
-
 		}
 	}
 </script>

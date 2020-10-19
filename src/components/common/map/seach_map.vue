@@ -30,12 +30,13 @@
 <script>
 	const AMap = window.AMap;
 	export default {
+		props:["infoAddress","infolonlat"],
 		data() {
 			return {
 				saddress: '', //保存地址的汉字名字
 				mapinfo:{
 					map: [], //保存地址的经纬度
-					address: '' //搜索的地区
+					address:'' //搜索的地区
 				},
 				poiArr: [], //左边搜索出来的数组
 				windowsArr: [], //信息窗口的数组
@@ -45,9 +46,13 @@
 				isMap: false
 			};
 		},
+		created(){
+			// console.log(this.infolonlat)
+			// this.mapinfo.map = this.infolonlat.split(',');
+		},
 		mounted() {
 			this.mapInit()
-			this.location()
+			// this.location()
 		},
 		methods: {
 			//创建一个map

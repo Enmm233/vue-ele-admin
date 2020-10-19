@@ -7,34 +7,27 @@
 						<div class="xian"></div>
 						可选赠品
 					</div>
-				<!-- 	<div class="tit_select">
-						<el-select placeholder="请选择产品分类" class="handle-select mr10">
-							<el-option key="bbk" label="步步高" value="bbk"></el-option>
-							<el-option key="xtc" label="小天才" value="xtc"></el-option>
-							<el-option key="imoo" label="imoo" value="imoo"></el-option>
-						</el-select>
-					</div> -->
 				</div>
 				
 				<el-table 
 					ref="multipleTable" 
-					:data="goodsAList" 
+					:data="goodsAList.data" 
 					border 
 					tooltip-effect="dark" 
 					style="width: 100%" 
-					height="400"
+					height="411"
 					row-key="date"
 					@selection-change="handleSelectionChange1">
 					<el-table-column type="selection" width="55">
 					</el-table-column>
-					<el-table-column prop="date" label="赠品ID" width="180">
+					<el-table-column prop="giftId" label="赠品ID" width="180">
 					</el-table-column>
-					<el-table-column prop="name" label="赠品名称" width="250">
+					<el-table-column prop="giftName" label="赠品名称" width="250">
 					</el-table-column>
 				</el-table>
 				<div class="pagination">
-					<el-pagination background layout="total, prev, pager, next" :current-page="query.pageIndex" :page-size="query.pageSize"
-					 :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+					<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10"
+					 @current-change="handlePageChange"></el-pagination>
 				</div>
 			</div>
 			<div class="btn">
@@ -54,14 +47,14 @@
 					border 
 					tooltip-effect="dark" 
 					style="width: 100%" 
-					height="400"
+					height="411"
 					row-key="date"
 					 @selection-change="handleSelectionChange2">
 					<el-table-column type="selection" width="55">
 					</el-table-column>
-					<el-table-column prop="date" label="赠品ID" width="180">
+					<el-table-column prop="giftId" label="赠品ID" width="180">
 					</el-table-column>
-					<el-table-column prop="name" label="赠品名称" width="250">
+					<el-table-column prop="giftName" label="赠品名称" width="250">
 					</el-table-column>
 				</el-table>
 			</div>
@@ -70,46 +63,58 @@
 </template>
 
 <script>
+	import {
+		listShopGift
+	} from '../../../api/index';
+	import { mapState } from 'vuex'
 	export default {
 		name: 'shuttle',
 		props: ['num'],
+		computed:{
+		   ...mapState(['accountId']),  //显示state的数据
+		  },
 		data() {
 			return {
-				query: {
-					pageIndex: 1,
-					pageSize: 10
-				},
-				pageTotal:10,
-				goodsAList: [{
-					date: '1',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
-				}, {
-					date: '2',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1517 弄'
-				}, {
-					date: '3',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1519 弄'
-				}, {
-					date: '4',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1517 弄'
-				}, {
-					date: '5',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1519 弄'
-				}],
+				page: 1,
+				pageTotal: 0,
+				goodsAList: [],
 				goodsAData: [],
 				multipleSelection1: '',
 				multipleSelection2: '',
 			};
 		},
+		created() {
+			this.getData();
+		},
 		methods: {
 			// 分页导航
 			handlePageChange(val) {
-				console.log(val)
+				this.page = val;
+				this.getData();
+			},
+			getData() {
+				this.goodsAList = [];
+				this.goodsAData = [];
+				var query = {
+					data: {
+						// accountId:localStorage.getItem('account_id'),
+						accountId: this.accountId,
+						giftName: '',
+						giftType: 0,
+						giftSort: 0,
+						giftSource: 0,
+						giftNum: -1,
+						nowPage: this.page,
+						pageCount: 9,
+					}
+				};
+				listShopGift(query).then(res => {
+					if (res.code == 1) {
+						// console.log(res)
+						this.goodsAList = res;
+						this.pageTotal = res.allPage;
+					}
+				});
 			},
 			handleSelectionChange1(val) {
 				this.multipleSelection1 = val;
@@ -119,19 +124,19 @@
 			},
 			left() {
 				let arr = this.multipleSelection2;
-				this.goodsAData = this.goodsAData.filter(t => !arr.some(s => s.date === t.date))
+				this.goodsAData = this.goodsAData.filter(t => !arr.some(s => s.giftId === t.giftId))
 				for (var i = 0; i < arr.length; i++) {
-					this.goodsAList.push(arr[i])
+					this.goodsAList.data.push(arr[i])
 				}
-				console.log('从2到1')
+				// console.log('从2到1')
 			},
 			right() {
 				let arr = this.multipleSelection1;
-				this.goodsAList = this.goodsAList.filter(t => !arr.some(s => s.date === t.date))
+				this.goodsAList.data = this.goodsAList.data.filter(t => !arr.some(s => s.giftId === t.giftId))
 				for (var i = 0; i < arr.length; i++) {
 					this.goodsAData.push(arr[i])
 				}
-				console.log('从1到2' + this.goodsAData)
+				// console.log('从1到2' + this.goodsAData)
 			}
 		}
 	}

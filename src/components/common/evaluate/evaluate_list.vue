@@ -1,21 +1,20 @@
 <template>
 	<div>
 		<div class="">
-			<el-table height="700" :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header"
-			 @selection-change="handleSelectionChange">
-				<el-table-column prop="id" label="用户ID" width="80" align="center"></el-table-column>
-				<el-table-column width="120" prop="name" label="用户昵称"></el-table-column>
+			<el-table height="480" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+				<el-table-column prop="userId" label="用户ID" width="80" align="center"></el-table-column>
+				<el-table-column width="120" prop="nickName" label="用户昵称"></el-table-column>
 				<el-table-column width="120" label="评论时间">
-					<template slot-scope="scope">{{scope.row.date}}</template>
+					<template slot-scope="scope">{{scope.row.createTime}}</template>
 				</el-table-column>
 				<el-table-column width="80" label="评论图片" align="center">
 					<template slot-scope="scope">
-						<el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]"></el-image>
+						<el-image class="table-td-thumb" :src="scope.row.image" :preview-src-list="[scope.row.image]"></el-image>
 					</template>
 				</el-table-column>
-				<el-table-column width="55" prop="id" label="评分" align="center"></el-table-column>
+				<el-table-column width="55" prop="starRating" label="评分" align="center"></el-table-column>
 
-				<el-table-column prop="date" label="评论内容"></el-table-column>
+				<el-table-column prop="content" label="评论内容"></el-table-column>
 				<el-table-column label="操作" width="100" align="center">
 					<template slot-scope="scope">
 						<el-button type="primary" size="mini" @click="handleEdit(scope.$index, scope.row)">回复</el-button>
@@ -23,13 +22,13 @@
 				</el-table-column>
 			</el-table>
 			<div class="pagination">
-				<el-pagination background layout="total, prev, pager, next" :current-page="query.pageIndex" :page-size="query.pageSize"
-				 :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+				<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10"
+				 @current-change="handlePageChange"></el-pagination>
 			</div>
 		</div>
 
 		<!-- 编辑弹出框 -->
-		<el-dialog title="编辑" :visible.sync="innerVisible" width="20%" append-to-body>
+		<el-dialog :close-on-click-modal="false" title="编辑" :visible.sync="innerVisible" width="20%" append-to-body>
 			<div class="evaluate_reply">
 				<div>
 					<p class="title">用户评论内容：</p>
@@ -58,11 +57,18 @@
 </template>
 
 <script>
-	import { fetchData } from '../../../api/index.js';
+	import { listShopWaresComment } from '../../../api/index.js';
+	import { mapState } from 'vuex'
 	export default {
 		name: 'evaluateList',
+		props:["id"],
+		computed:{
+		     ...mapState(['accountId']),  //显示state的数据
+		    },
 		data() {
 			return {
+				page: 1,
+				pageTotal: 0,
 				query: {
 					address: '',
 					name: '',
@@ -84,13 +90,32 @@
 			this.getData();
 		},
 		methods: {
-			// 获取 easy-mock 的模拟数据
 			getData() {
-				fetchData(this.query).then(res => {
-					console.log(res);
-					this.tableData = res.list;
-					this.pageTotal = res.pageTotal || 50;
+				var query = {
+					data: {
+						// accountId:localStorage.getItem('account_id'),
+						accountId: this.accountId,
+						waresName: '',
+						productName: '',
+						startTime: '',
+						endTime: '',
+						starRating: 0,
+						reply: 0,
+						nowPage: this.page,
+						pageCount: 6,
+					}
+				};
+				listShopWaresComment(query).then(res => {
+					if (res.code == 1) {
+						this.tableData = res;
+						this.pageTotal = res.allPage;
+					}
 				});
+			},
+			// 分页导航
+			handlePageChange(val) {
+				this.page = val;
+				this.getData();
 			},
 			// 编辑操作
 			handleEdit(index, row) {
@@ -104,11 +129,6 @@
 				this.$message.success(`修改第 ${this.idx + 1} 行成功`);
 				this.$set(this.tableData, this.idx, this.form);
 			},
-			// 分页导航
-			handlePageChange(val) {
-				this.$set(this.query, 'pageIndex', val);
-				this.getData();
-			}
 		},
 
 	};

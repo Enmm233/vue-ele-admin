@@ -8,15 +8,39 @@
 	const AMap = window.AMap;
 	var map, marker;
 	export default {
-		props:['arriveCoor'],
+		props: ['arriveCoor'],
 		data() {
 			return {
 				arrive: "", //位置信息
 			};
 		},
+		// mounted() {
+		// 	var that = this;
+		// 	var time = setTimeout(function(){
+		// 		that.init()
+		// 	},100)
+		// },
+		// methods:{
+		// 	init(){
+		// 		console.log(this.arriveCoor)
+		// 	        map = new AMap.Map('iCenter', {
+		// 	          center:this.arriveCoor,
+		// 	          resizeEnable: true,
+		// 	          zoom: 10
+		// 	        })
+		// 	        AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], function () {
+		// 	          map.addControl(new AMap.ToolBar())
+		// 	          map.addControl(new AMap.Scale())
+		// 	        })
+		// 	      }
+		// }
 		mounted() {
-			this.mapDraw(this.arriveCoor),
-				this.mapCoor(this.arriveCoor)
+			// var that = this;
+			// var time = setTimeout(function(){
+			// 	that.mapDraw(that.arriveCoor),
+			// 	that.mapCoor(that.arriveCoor)
+			// },100)
+			
 		},
 		methods: {
 			mapDraw(arriveCoor) {
@@ -25,6 +49,10 @@
 					zoom: 16, //初始化地图层级
 					center: arriveCoor //初始化地图中心点
 				});
+				AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], function() {
+					map.addControl(new AMap.ToolBar())
+					map.addControl(new AMap.Scale())
+				})
 				// 定位点
 				this.addMarker(arriveCoor);
 			},
@@ -70,5 +98,4 @@
 		flex: 1;
 		margin-top: 20px;
 	}
-
 </style>

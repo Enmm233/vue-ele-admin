@@ -3,36 +3,24 @@
 	<div>
 		<div class="container">
 			<div class="flex flex_item_between">
-				<el-form class="flex flex-wrap" label-width="80px">
+				<el-form class="flex flex_wrap" label-width="80px">
 					<el-form-item label="产品名称">
 						<el-input v-model="productName" class="handle-input mr10"></el-input>
 					</el-form-item>
 					<el-form-item label="产品分类">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="classifyOneName" placeholder="请选择" @change="selectOne" class="handle-select mr10">
-							    <el-option
-							      v-for="(item,index) in classifyOne"
-							      :key="item.id"
-							      :label="item.name"
-							      :value="index">
-							    </el-option>
-							  </el-select>
+								<el-option v-for="(item,index) in classifyOne" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
 							<el-select v-model="classifyTwoName" placeholder="请选择" @change="selectTwo" class="handle-select mr10">
-							    <el-option
-							      v-for="(item,index) in classifyTwo"
-							      :key="item.id"
-							      :label="item.name"
-							      :value="index">
-							    </el-option>
-							  </el-select>
+								<el-option v-for="(item,index) in classifyTwo" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
 							<el-select v-model="classifyThreeName" placeholder="请选择" @change="selectThree" class="handle-select mr10">
-							    <el-option
-							      v-for="(item,index) in classifyThree"
-							      :key="item.id"
-							      :label="item.name"
-							      :value="index">
-							    </el-option>
-							  </el-select>
+								<el-option v-for="(item,index) in classifyThree" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
 						</div>
 					</el-form-item>
 					<el-form-item label="品牌" label-width="50px">
@@ -42,13 +30,14 @@
 						<el-input v-model="origin" class="pick-input mr10"></el-input>
 					</el-form-item>
 				</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
 			</div>
 			<div class="handle-box">
 				<el-button type="primary" @click="open">添加</el-button>
-				<el-button type="info" @click="toPage">删除</el-button>
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
+				<!-- <el-button type="info" @click="toPage">删除</el-button> -->
 			</div>
 
 			<el-table height="555" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
@@ -66,8 +55,12 @@
 					<template slot-scope="scope">{{scope.row.categoryName}}</template>
 				</el-table-column>
 				<el-table-column label="产品图片" width="120" align="center">
-					<template slot-scope="scope">
-						<el-image class="table-td-thumb" :src="scope.row.image" :preview-src-list="[scope.row.image]"></el-image>
+					<template slot-scope="scope">			
+						<el-image 
+						class="table-td-thumb" 
+						:src="imgUrl+scope.row.image" 
+						@click.stop="handleClickItem" 
+						:preview-src-list="[imgUrl+scope.row.image]"></el-image>
 					</template>
 				</el-table-column>
 				<el-table-column label="品牌名称" width="120" align="center">
@@ -88,23 +81,22 @@
 				</el-table-column>
 			</el-table>
 			<div class="pagination">
-				<el-pagination background layout="total, prev, pager, next"
-				 :page-count="pageTotal" :page-size="10" @current-change="handlePageChange"></el-pagination>
+				<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10" @current-change="handlePageChange"></el-pagination>
 			</div>
 		</div>
 
 		<!-- 编辑弹出 -->
-		<el-dialog title="编辑产品" :visible.sync="editProduct" width="80%">
-			<edit-product :shopProductId="shopProductId" :addProduct="editProduct" @addProductCil="editProductCil"></edit-product>
+		<el-dialog title="编辑产品" :close-on-click-modal="false" :visible.sync="editProduct" width="80%">
+			<edit-product ref="child" :shopProductId="shopProductId" :editProduct="editProduct" @editProductCil="editProductCil"></edit-product>
 		</el-dialog>
 		<!-- 添加弹出框 -->
-		<el-dialog title="添加产品" :visible.sync="addProduct" width="80%">
-			<add-product :addProduct="addProduct" @addProductCil="addProductCil"></add-product>
+		<el-dialog title="添加产品" :close-on-click-modal="false" :visible.sync="addProduct" width="80%">
+			<add-product ref="addChild" :addProduct="addProduct" @addProductCil="addProductCil"></add-product>
 		</el-dialog>
-		
-		
+
+
 		<!-- 入库弹出框 -->
-		<el-dialog title="产品入库" :visible.sync="editVisible3" width="20%">
+		<el-dialog title="产品入库" :close-on-click-modal="false" :visible.sync="editVisible3" width="20%">
 			<el-form ref="form" :model="form" label-width="70px">
 				<el-form-item label="产品名称">
 					<span>fjsdfjdfk</span>
@@ -125,7 +117,9 @@
 </template>
 
 <script>
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	import {
 		fetchData,
 		shopProductCategoryt,
@@ -136,97 +130,179 @@
 	import editProduct from '../../common/addGoods/edit_product.vue'
 	export default {
 		name: 'basetable',
-		components:{
+		computed:{
+		     ...mapState(['accountId','imgUrl']),  //显示state的数据
+		    },
+		components: {
 			addProduct,
 			editProduct
 		},
 		data() {
 			return {
-				productName:'',  //产品名称
-				brand:'',  		 //品牌
-				origin:'',  	 //产地
-				classifyId:0,  //分类ID
-				classifyOne:'',  //分类一
-				classifyOneName:'',
-				classifyTwo:'',  //分类二
-				classifyTwoName:'',
-				classifyThree:'',  //分类三
-				classifyThreeName:'',  
-				page:1,
+				productName: '', //产品名称
+				brand: '', //品牌
+				origin: '', //产地
+				classifyId: 0, //分类ID
+				classifyOne: '', //分类一
+				classifyOneName: '',
+				classifyTwo: '', //分类二
+				classifyTwoName: '',
+				classifyThree: '', //分类三
+				classifyThreeName: '',
+				page: 1,
 				pageTotal: 0,
-				query: {
-					address: '',
-					name: '',
-					pageIndex: 1,
-					pageSize: 10
-				},
-				form:'',
+				form: '',
 				tableData: '',
 				multipleSelection: [],
 				delList: [],
 				editProduct: false,
 				editVisible3: false,
 				addProduct: false,
-				shopProductId:'',
+				shopProductId: '',
 				idx: -1,
 				id: -1,
 			};
+		},
+		watch: {
+			'$route.path': function(newVal, oldVal) {
+				this.productName = '';
+				this.brand = '';
+				this.origin = '';
+				this.classifyId = 0;
+				this.classifyOne = '';
+				this.classifyOneName = '';
+				this.classifyTwo = '';
+				this.classifyTwoName = '';
+				this.classifyThree = '';
+				this.classifyThreeName = '';
+				this.page = 1;
+				this.pageTotal = 0;
+			}
 		},
 		created() {
 			this.getData();
 			this.productCategory();
 		},
 		methods: {
-			addProductCil(data){  //添加
+			refreshData(){
+				//刷新列表
+				this.productName = '';
+				this.brand = '';
+				this.origin = '';
+				this.classifyId = 0;
+				this.classifyOne = '';
+				this.classifyOneName = '';
+				this.classifyTwo = '';
+				this.classifyTwoName = '';
+				this.classifyThree = '';
+				this.classifyThreeName = '';
+				this.page = 1;
+				this.pageTotal = 0;
+				this.getData();
+				this.productCategory();
+			},
+			handleClickItem() {
+				// 获取遮罩层dom
+				var domImageMask = '';
+				var time = setTimeout(function(){
+					domImageMask = document.querySelector(".el-image-viewer__mask");
+					if (!domImageMask) {
+						return;
+					}
+					domImageMask.addEventListener("click", () => {
+						// 点击遮罩层时调用关闭按钮的 click 事件
+						document.querySelector(".el-image-viewer__close").click();
+						clearTimeout(time);
+					});
+				},100)
+			},
+			addProductCil(data) { //添加
 				this.addProduct = !data.addProduct;
-				if(data.type == "成功"){
+				if (data.type == "成功") {
+					this.productName = '';
+					this.brand = '';
+					this.origin = '';
+					this.classifyId = 0;
+					this.$message.success('添加成功');
 					this.getData();
 				}
 			},
-			editProductCil(data){  //编辑
+			editProductCil(data) { //编辑
 				this.editProduct = !data.editProduct;
-				if(data.type == "成功"){
+				if (data.type == "成功") {
+					this.productName = '';
+					this.brand = '';
+					this.origin = '';
+					this.classifyId = 0;
+					this.$message.success('修改成功');
 					this.getData();
 				}
 			},
 			//显示入库
-			headlePutStorage(index, row){
+			headlePutStorage(index, row) {
 				this.editVisible3 = true;
 			},
 			//入库
-			putStorage(index, row){
+			putStorage(index, row) {
 				this.editVisible3 = false;
 				// addShopWarehousing
 				this.$message.success("入库");
 			},
-			selectOne(e){
-				this.classifyId = this.classifyOne[e].id;
-				this.classifyTwo = this.classifyOne[e].list
+			selectOne(e) {
+				var query = {
+					data: {
+						parentId: this.classifyOne[e].id
+					}
+				};
+				shopProductCategoryt(query).then(res => {
+					this.classifyId = this.classifyOne[e].id;
+					if (res.code == 1) {
+						this.classifyTwo = res.data
+					}else{
+						this.classifyTwo = ''; //分类二
+						this.classifyTwoName = '';
+						this.classifyThree = ''; //分类三
+						this.classifyThreeName = '';
+					}
+				});
+				
 			},
-			selectTwo(e){
-				this.classifyId = this.classifyTwo[e].id;
-				this.classifyThree = this.classifyTwo[e].list;
+			selectTwo(e) {
+				var query = {
+					data: {
+						parentId: this.classifyTwo[e].id
+					}
+				};
+				shopProductCategoryt(query).then(res => {
+					this.classifyId = this.classifyTwo[e].id;
+					if (res.code == 1) {
+						this.classifyThree = res.data
+					}else{
+						this.classifyThree = ''; //分类三
+						this.classifyThreeName = '';
+					}
+				});
 			},
-			selectThree(e){
+			selectThree(e) {
 				this.classifyId = this.classifyThree[e].id;
 			},
 			// 获取 easy-mock 的模拟数据
 			getData() {
 				var query = {
-					data:{
-						// account_id:localStorage.getItem('account_id'),
-						account_id:1596621041,
-						productName:this.productName,
-						brand:this.brand,  		 
-						placeOrigin:this.origin,  	 
-						categoryId:this.classifyId,
-						nowPage:this.page,
-						pageCount:9,
+					data: {
+						// accountId:localStorage.getItem('account_id'),
+						accountId: this.accountId,
+						productName: this.productName,
+						brand: this.brand,
+						placeOrigin: this.origin,
+						categoryId: this.classifyId,
+						nowPage: this.page,
+						pageCount: 9,
 					}
 				};
 				getShopProductList(query).then(res => {
-					if(res.code == 1){
-						console.log(res.allPage)
+					if (res.code == 1) {
+						this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
 					}
@@ -235,13 +311,13 @@
 			// 获取产品分类
 			productCategory() {
 				var query = {
-					data:{
-						waresType:1
+					data: {
+						parentId: 0
 					}
 				};
 				shopProductCategoryt(query).then(res => {
-					// console.log(res)
-					if(res.code == 1){
+					console.log(res)
+					if (res.code == 1) {
 						this.classifyOne = res.data
 					}
 				});
@@ -254,44 +330,39 @@
 					})
 					.then(() => {
 						var query = {
-							data:{
-								shopProductId:row.id
+							data: {
+								shopProductId: row.id
 							}
 						};
 						delShopProduct(query).then(res => {
 							// console.log(res)
-							if(res.code == 1){
+							if (res.code == 1) {
 								this.$message.success('删除成功');
-								this.tableData.data.splice(index, 1);
+								// this.tableData.data.splice(index, 1);
+								this.getData();
 							}
 						});
-						
+
 					})
 					.catch(() => {});
 			},
-			
-			
-			toPage(){
-				// this.$router.push({ path:'/add_product'})
-			},
-			
-			
-			resetForm(formName) {
-				this.$refs[formName].resetFields();
-			},
+
 			open() {
 				this.addProduct = true;
+				if(this.$refs.addChild){
+					this.$refs.addChild.productCategory();
+				}
 			},
 			indexMethod(index) {
 				return index + 1;
 			},
-			
+
 			// 触发搜索按钮
 			handleSearch() {
 				this.page = 1;
 				this.getData();
 			},
-	
+
 			// 多选操作
 			handleSelectionChange(val) {
 				this.multipleSelection = val;
@@ -308,11 +379,14 @@
 			},
 			// 编辑操作
 			handleEdit(index, row) {
-				console.log(row.id)
 				this.shopProductId = row.id;
 				this.idx = index;
-				this.form = row;
+				// this.form = row;
 				this.editProduct = true;
+				if(this.$refs.child){
+					this.$refs.child.getProduct(row.id);
+				}
+				
 			},
 			// 分页导航
 			handlePageChange(val) {
@@ -363,8 +437,9 @@
 		width: 200px;
 		display: inline-block;
 	}
+
 	.big-input {
-		width: 600px;
+		width: 100% !important;
 		display: inline-block;
 	}
 

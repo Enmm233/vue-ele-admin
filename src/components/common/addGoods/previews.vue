@@ -4,28 +4,35 @@
 		<div class="top flex">
 			<div class="left">
 				<div class="demo-image">
-					<div class="block">
-						<el-image style="width: 150px; height: 100px;border: 1px solid #eee;" src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+					<div class="block" v-if="infoItem != ''">
+						<el-image 
+						style="width: 150px; height: 100px;border: 1px solid #eee;" 
+						:src="imgUrl+infoItem.waresImg"
+						 fit="contain"></el-image>
+					</div>
+					<div class="block" v-else>
+						<el-image 
+						style="width: 150px; height: 100px;border: 1px solid #eee;" 
 						 fit="contain"></el-image>
 					</div>
 				</div>
 			</div>
 			<div class="right flex_column flex_item_between">
-				<div class="name">商品名称</div>
+				<div class="name" v-if="info.waresName">{{info.waresName}}</div>
 				<div class="spec flex" v-if="selectArr != ''">
 					<span>已选规格：</span>
 					<div v-for="item in selectArr" class="flex">
 						{{item.tt}};
-						<block v-if="item.datas" class="flex">
+						<div v-if="item.datas" class="flex">
 							<div v-for="dd in item.datas">
 								{{dd.ss}};
 							</div>
-						</block>
+						</div>
 					</div>
 				</div>
-				<div class="num flex flex_item_between">
-					<span>库存数：36个</span>
-					<span>¥0.00</span>
+				<div class="num flex flex_item_between" v-if="infoItem">
+					<span>库存数：{{infoItem.stocstockNumber}}{{infoItem.waresCompany}}</span>
+					<span>¥{{infoItem.price}}</span>
 				</div>
 			</div>
 		</div>
@@ -33,136 +40,39 @@
 			<div v-for="(item,itemInd) in list">
 				<spec :specList='item' @transferUser="clickLi"></spec>
 			</div>
-			
 		</div>
-
-
-
-
 	</div>
 </template>
 
 <script>
 	import spec from './spec.vue'
-	export default {
+	import { mapState } from 'vuex'
+	export default { 
 		name: 'previews',
-		props: ['num'],
+		props: ['info','list'],
+		computed:{
+			...mapState(['imgUrl']),  //显示state的数据
+		},
 		components: {
 			spec,
 		},
 		data() {
 			return {
-				selectArr:[],
+				selectArr: [],
 				goodsAData: {
 					// tit:'',
 					name: ''
 				},
 				colorList: [],
-				list: [{
-						"title": "尺码",
-						"attr": [{
-								"id": 1,
-								"data": "36码",
-								"state": 1,
-								"child": {
-									"title": "颜色",
-									"attr": [{
-											"id": 11,
-											"data": "黄色",
-											"state": 1
-										},
-										{
-											"id": 12,
-											"data": "绿色",
-											"state": 1
-										},
-										{
-											"id": 13,
-											"data": "白色",
-											"state": 1
-										}
-									]
-								}
-							},
-							{
-								"id": 2,
-								"data": "37码",
-								"state": 1,
-								"child": {
-									"title": "颜色",
-									"attr": [{
-											"id": 11,
-											"data": "红色",
-											"state": 1
-										},
-										{
-											"id": 12,
-											"data": "绿色",
-											"state": 1
-										},
-										{
-											"id": 13,
-											"data": "棕色",
-											"state": 1
-										}
-									]
-								}
-							},
-							{
-								"id": 3,
-								"data": "38码",
-								"state": 1
-							}
-						]
-					},
-					{
-						"title": "产地",
-						"attr": [{
-								"id": 4,
-								"data": "南昌县",
-								"state": 1,
-								"child": {
-									"title": "地址",
-									"attr": [{
-											"id": 11,
-											"data": "哈哈",
-											"state": 1
-										},
-										{
-											"id": 12,
-											"data": "呵呵",
-											"state": 1
-										},
-										{
-											"id": 13,
-											"data": "嘻嘻",
-											"state": 1
-										}
-									]
-								}
-							},
-							{
-								"id": 5,
-								"data": "新建县",
-								"state": 1
-							},
-							{
-								"id": 6,
-								"data": "安义县",
-								"state": 1
-							}
-						]
-					}
-				],
-				active: ''
+				active: '',
+				infoItem:'',
 
 			};
 		},
 		created() {
-
 		},
 		methods: {
-			clickLi(data) {
+			clickLi(data,infoItem) {
 				var narA = this.selectArr;
 				narA.map((item, index) => {
 					if (item.tittle == data.sub[0].tittle) {
@@ -170,6 +80,8 @@
 					}
 				})
 				narA.push(data.sub[0])
+				this.infoItem = infoItem;
+				// console.log(infoItem)
 			},
 		}
 	}
@@ -213,6 +125,7 @@
 	.num {
 		color: #333;
 		font-size: 12px;
+		width: 100%;
 	}
 
 	.preview .spec_tag {

@@ -3,7 +3,7 @@
 	<div>
 		<div class="container">
 			<div class="handle-box flex flex_item_between">
-				<el-form ref="form" :model="form" class="flex flex-wrap">
+				<el-form ref="form" :model="form" class="flex flex_wrap">
 					<el-form-item label="顾客" label-width="50px">
 						<el-input v-model="form.name" placeholder="输入订单ID" class="handle-input mr10"></el-input>
 					</el-form-item>
@@ -20,9 +20,9 @@
 						<el-input v-model="form.name" placeholder="输入订单ID" class="handle-input mr10"></el-input>
 					</el-form-item>
 				</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
 			</div>
 			
 			<el-table height="600" :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header"
@@ -58,8 +58,12 @@
 	import {
 		fetchData
 	} from '../../../api/index';
+	import { mapState } from 'vuex'
 	export default {
 		name: 'Inventory_change',
+		computed:{
+		     ...mapState(['accountId']),  //显示state的数据
+		    },
 		data() {
 			return {
 				query: {
@@ -112,6 +116,7 @@
 					})
 					.then(() => {
 						this.$message.success('删除成功');
+						this.getData();
 						this.tableData.splice(index, 1);
 					})
 					.catch(() => {});

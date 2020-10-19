@@ -3,7 +3,7 @@
     <div>
         <div class="container">
             <div class="handle-box flex flex_item_between">
-            	<el-form ref="form" :model="form" class="flex flex-wrap" label-width="80px">
+            	<el-form ref="form" :model="form" class="flex flex_wrap" label-width="80px">
             		<el-form-item label="产品/服务">
             			<el-input v-model="form.productName" placeholder="输入产品名称/ID" class="handle-input mr10"></el-input>
             		</el-form-item>
@@ -25,9 +25,9 @@
             		</el-form-item>
             		
             	</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
             </div>
             <el-table
 				height="600"
@@ -57,15 +57,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import { fetchData,listShopWarehousing } from '../../../api/index';
 import { dateFormat } from '../../../utils/utils';
 export default {
     name: 'Inventory_change',
+	computed:{
+	     ...mapState(['accountId']),  //显示state的数据
+	    },
     data() {
         return {
-            
 			form:{
-				accountId:1596621041,
+				// account_id:this.accountId,
 				productName:'',
 				warehousingBatch:'',
 			},
@@ -96,9 +99,10 @@ export default {
         // 获取 easy-mock 的模拟数据
         getData() {
 			var item = this.form;
+			// console.log(this.accountId)
 			var query = {
 				data:{
-					accountId:item.accountId,
+					accountId:this.accountId,
 					productName:item.productName,
 					warehousingBatch:item.warehousingBatch,
 					startTime:'',  		 

@@ -3,12 +3,12 @@
 	<div>
 		<div class="container">
 			<div class="handle-box flex flex_item_between">
-				<el-form ref="form" class="flex flex-wrap" label-width="80px">
+				<el-form ref="form" class="flex flex_wrap" label-width="80px">
 					<el-form-item label="赠品">
 						<el-input v-model="giftName" placeholder="输入产品名称/ID" class="handle-input mr10"></el-input>
 					</el-form-item>
 					<el-form-item label="赠品类型">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="giftTypeStr" placeholder="默认" @change="giftTypeCil" class="handle-select mr10">
 								<el-option
 								  v-for="(item,index) in giftTypeList"
@@ -29,7 +29,7 @@
 						</div>
 					</el-form-item>
 					<el-form-item label="赠品来源">
-						<div class="flex flex-wrap">
+						<div class="flex flex_wrap">
 							<el-select v-model="giftSourceStr" placeholder="默认" @change="giftSourceCil" class="handle-select mr10">
 								<el-option
 								  v-for="(item,index) in giftSourceList"
@@ -45,13 +45,13 @@
 						<el-input type="number" v-model="giftNum" placeholder="输入库存数量" class="handle-input mr10"></el-input>
 					</el-form-item>
 				</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
 			</div>
 			<div class="handle-box">
 				<el-button type="primary" @click="handleAdd">添加</el-button>
-				<el-button type="info">删除</el-button>
+				<!-- <el-button type="info">删除</el-button> -->
 			</div>
 			<el-table height="555" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
 			 @selection-change="handleSelectionChange">
@@ -75,7 +75,11 @@
 				</el-table-column>
 				<el-table-column label="赠品图片" align="center" width="100">
 					<template slot-scope="scope">
-						<el-image class="table-td-thumb" :src="scope.row.giftImg" :preview-src-list="[scope.row.giftImg]"></el-image>
+						<el-image 
+						class="table-td-thumb" 
+						:src="imgUrl+scope.row.giftImg" 
+						@click.stop="handleClickItem" 
+						:preview-src-list="[imgUrl+scope.row.giftImg]"></el-image>
 					</template>
 				</el-table-column>
 				<el-table-column label="赠品来源" width="100">
@@ -113,7 +117,7 @@
 			</div>
 		</div>
 
-		<el-dialog title="添加赠品" :visible.sync="dialogVisible" width="30%">
+		<el-dialog :close-on-click-modal="false" title="添加赠品" :visible.sync="dialogVisible" width="30%">
 			<div>
 				<div class="handle-box">
 					<el-form ref="giftItem" :model="giftItem" label-width="80px">
@@ -141,7 +145,7 @@
 							</div>
 						</el-form-item>
 						<el-form-item label="赠品价值">
-							<el-input v-model="giftItem.giftPrice" placeholder="输入赠品市场价"></el-input>
+							<el-input type="number" v-model="giftItem.giftPrice" placeholder="输入赠品市场价"></el-input>
 						</el-form-item>
 						<el-form-item label="赠品来源">
 							<div>
@@ -157,7 +161,6 @@
 						</el-form-item>
 						<el-form-item label="赠品单位">
 							<div>
-								
 								<el-select v-model="giftItem.giftCompanyStr" placeholder="默认" @change="editGiftCompanyCil" class="handle-select mr10">
 									<el-option
 									  v-for="(item,index) in giftItem.giftCompanyList"
@@ -169,18 +172,18 @@
 							</div>
 						</el-form-item>
 						<el-form-item label="赠品数量">
-							<el-input v-model="giftItem.giftNum" placeholder="输入赠品数量"></el-input>
+							<el-input type="number" v-model="giftItem.giftNum" placeholder="输入赠品数量"></el-input>
 						</el-form-item>
 						<el-form-item label="赠品图片" prop="region">
 							<div>图片大小不能超过3M 建议尺寸：300*300像素，最多1张</div>
 							<div class="flex">
-								<el-image
+							<!-- 	<el-image
 									v-if="giftItem.giftImg != ''"
 									style="width: 148px; height: 148px; margin-right: 10px;"
 									:src="giftItem.giftImg" />
-								</el-image>
+								</el-image> -->
 								<el-upload 
-								action="http://192.168.0.222:8080/api/uploadImg" 
+								:action="imgStr" 
 								:data="query" 
 								list-type="picture-card" 
 								:limit="1" 
@@ -189,7 +192,8 @@
 								:before-upload="beforeAvatarUpload" 
 								:on-exceed="handleExceed" 
 								:on-preview="handleProductPreview"
-								:on-remove="productRemove">
+								:on-remove="productRemove"
+								:file-list="giftImgList">
 									<i class="el-icon-plus"></i>
 								</el-upload>
 							</div>
@@ -223,7 +227,7 @@
 	export default {
 		name: 'giftList',
 		computed:{
-			...mapState(['imgUrl']),  //显示state的数据
+			...mapState(['imgUrl','accountId','imgStr']),  //显示state的数据
 		},
 		data() {
 			return { 
@@ -246,6 +250,7 @@
 				
 				productImg: '', //预览产品图片路径
 				productUrl: '', //后台返回的产品图片路径
+				giftImgList:[],  //赠品图片
 				showProductImg: false, //是否显示产品图片预览
 				query: { //上传图片固定参数
 					data: "{'flag': '3'}"
@@ -291,6 +296,21 @@
 			this.getData();
 		},
 		methods: {
+			handleClickItem() {
+				// 获取遮罩层dom
+				var domImageMask = '';
+				var time = setTimeout(function(){
+					domImageMask = document.querySelector(".el-image-viewer__mask");
+					if (!domImageMask) {
+						return;
+					}
+					domImageMask.addEventListener("click", () => {
+						// 点击遮罩层时调用关闭按钮的 click 事件
+						document.querySelector(".el-image-viewer__close").click();
+						clearTimeout(time);
+					});
+				},100)
+			},
 			//点发送
 			submit(){
 				if(this.giftItem.type == 1){
@@ -305,16 +325,44 @@
 			//添加请求
 			addGift(){
 				var item = this.giftItem;
+				if(item.giftName == ''){
+					this.$message.error('请输入赠品名称');
+					return
+				}
+				if(item.giftType == 0){
+					this.$message.error('请选择赠品类型');
+					return
+				}
+				if(item.giftPrice == ''){
+					this.$message.error('请输入赠品价格');
+					return
+				}
+				if(item.giftSource == 0){
+					this.$message.error('请选择赠品来源');
+					return
+				}
+				if(item.giftCompany == 0){
+					this.$message.error('请选择赠品单位');
+					return
+				}
+				if(item.giftNum == 0){
+					this.$message.error('请输入赠品数量');
+					return
+				}
+				if(item.giftPrice < 0 || item.giftNum < 0){
+					this.$message.error("禁止输入负数");
+					return;
+				}
+			
 				var img = '';
 				if(item.giftImg != ''){
 					img = item.giftImg
 				}else{
-					img = this.imgUrl+this.productUrl
+					img = this.productUrl
 				}
 				var query = {
 					data:{
-						// accountId:localStorage.getItem('account_id'),
-						accountId:1596621041,
+						accountId:this.accountId,
 						giftName:item.giftName,
 						giftType:item.giftType,
 						giftSort:item.giftSort,
@@ -331,6 +379,7 @@
 						this.$refs['my-upload'].clearFiles();
 						this.productUrl = '';
 						this.productImg = '';
+						this.giftImgList = [];
 						this.$message.success('添加成功');
 						this.getData()
 					}
@@ -339,11 +388,40 @@
 			//编辑请求
 			editGift(){
 				var item = this.giftItem;
+				if(item.giftName == ''){
+					this.$message.error('请输入赠品名称');
+					return
+				}
+				if(item.giftType == 0){
+					this.$message.error('请选择赠品类型');
+					return
+				}
+				if(item.giftPrice == ''){
+					this.$message.error('请输入赠品价格');
+					return
+				}
+				if(item.giftSource == 0){
+					this.$message.error('请选择赠品来源');
+					return
+				}
+				if(item.giftCompany == 0){
+					this.$message.error('请选择赠品单位');
+					return
+				}
+				if(item.giftNum == 0){
+					this.$message.error('请输入赠品数量');
+					return
+				}
+				if(item.giftPrice < 0 || item.giftNum < 0){
+					this.$message.error("禁止输入负数");
+					return;
+				}
+							
 				var img = '';
 				if(item.giftImg != ''){
 					img = item.giftImg
 				}else{
-					img = this.imgUrl+this.productUrl
+					img = this.productUrl
 				}
 				var query = {
 					data:{
@@ -365,6 +443,7 @@
 						this.$refs['my-upload'].clearFiles();
 						this.productUrl = '';
 						this.productImg = '';
+						this.giftImgList = [];
 						this.$message.success('修改成功');
 						this.getData()
 					}
@@ -395,6 +474,7 @@
 			//点击添加
 			handleAdd(){
 				this.dialogVisible = true;
+				this.giftImgList = [];
 				// 单个赠品详情
 				this.giftItem = {
 					giftId:'',  //赠品编号
@@ -463,6 +543,13 @@
 							giftImg:res.data.giftImg,  //赠品图片
 							storeId:res.data.storeId   //店铺ID
 						};
+						//产品图片
+						var urlStr = res.data.giftImg.split(',');
+						urlStr.forEach(item => {
+							let obj = new Object();
+							obj.url = this.imgUrl+item;
+							this.giftImgList.push(obj);
+						});
 					}
 				});
 			},
@@ -513,7 +600,7 @@
 				var query = {
 					data:{
 						// accountId:localStorage.getItem('account_id'),
-						accountId:1596621041,
+						accountId:this.accountId,
 						giftName:this.giftName,
 						giftType:this.giftType,
 						giftSort:this.giftSort,  		 
@@ -560,7 +647,8 @@
 						delShopGift(query).then(res => {
 							if(res.code == 1){
 								this.$message.success('删除成功');
-								this.tableData.data.splice(index, 1);
+								// this.tableData.data.splice(index, 1);
+								this.getData();
 							}
 						});
 					})

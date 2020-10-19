@@ -3,28 +3,31 @@
 	<div>
 		<div class="container">
 			<div class="handle-box flex flex_item_between">
-				<el-form ref="form" :model="form" class="flex flex-wrap" label-width="80px">
+				<el-form ref="form" :model="form" class="flex flex_wrap" label-width="80px">
 					<el-form-item label="商品">
-						<el-input v-model="form.name" placeholder="输入商品名称" class="handle-input"></el-input>
+						<el-input v-model="form.waresName" placeholder="输入商品名称" class="handle-input"></el-input>
 					</el-form-item>
-					<el-form-item label="用户">
-						<el-input v-model="form.name" placeholder="输入用户名称" class="handle-input"></el-input>
+					<el-form-item label="产品">
+						<el-input v-model="form.productName" placeholder="输入产品名称" class="handle-input"></el-input>
 					</el-form-item>
 					<el-form-item label="评分">
-						<div class="flex flex-wrap">
-							<el-select v-model="form.one" placeholder="默认" class="handle-select">
-								<el-option key="bbk" label="步步高" value="bbk"></el-option>
-								<el-option key="xtc" label="小天才" value="xtc"></el-option>
-								<el-option key="imoo" label="imoo" value="imoo"></el-option>
+						<div class="flex flex_wrap">
+							<el-select v-model="form.starRatingStr" @change="starRatingSelect" placeholder="默认" class="handle-select">
+								<el-option key="0" label="全部" value="0"></el-option>
+								<el-option key="1" label="1" value="1"></el-option>
+								<el-option key="2" label="2" value="2"></el-option>
+								<el-option key="3" label="3" value="3"></el-option>
+								<el-option key="4" label="4" value="4"></el-option>
+								<el-option key="5" label="5" value="5"></el-option>
 							</el-select>
 						</div>
 					</el-form-item>
 					<el-form-item label="回复状态">
-						<div class="flex flex-wrap">
-							<el-select v-model="form.one" placeholder="默认" class="handle-select">
-								<el-option key="bbk" label="步步高" value="bbk"></el-option>
-								<el-option key="xtc" label="小天才" value="xtc"></el-option>
-								<el-option key="imoo" label="imoo" value="imoo"></el-option>
+						<div class="flex flex_wrap">
+							<el-select v-model="form.replyStr" @change="replySelect"  placeholder="默认" class="handle-select">
+								<el-option key="0" label="全部" value="0"></el-option>
+								<el-option key="1" label="已回复" value="1"></el-option>
+								<el-option key="2" label="未回复" value="2"></el-option>
 							</el-select>
 						</div>
 					</el-form-item>
@@ -40,103 +43,60 @@
 						  </div>
 					</el-form-item>
 				</el-form>
-				<block>
+				<div>
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
-				</block>
+				</div>
 			</div>
-			<el-table height="600" :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header"
+			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
 			 @selection-change="handleSelectionChange">
-				<el-table-column prop="id" label="商品ID" width="100" align="center"></el-table-column>
-				<el-table-column prop="name" label="商品名称" width="300"></el-table-column>
-				<el-table-column prop="id" label="商品规格" align="center" width="200"></el-table-column>
-				<el-table-column prop="id" label="用户ID" align="center" width="200"></el-table-column>
+				<el-table-column prop="waresId" label="商品ID" width="100" align="center"></el-table-column>
+				<el-table-column prop="waresName" label="商品名称" width="300"></el-table-column>
+				<el-table-column prop="serviceName" label="商品规格" align="center" width="200"></el-table-column>
+				<el-table-column prop="userId" label="用户ID" align="center" width="200"></el-table-column>
 				<el-table-column prop="id" label="用户昵称" align="center" width="200"></el-table-column>
-				<el-table-column prop="date" label="创建时间" align="center" width="150"></el-table-column>
+				<el-table-column prop="createTime" label="创建时间" align="center" width="150"></el-table-column>
 				<el-table-column label="商品图片" align="center">
 					<template slot-scope="scope">
-						<el-image class="table-td-thumb" :src="scope.row.thumb" :preview-src-list="[scope.row.thumb]"></el-image>
+						<!-- <el-image class="table-td-thumb" :src="imgUrl+scope.row.image" :preview-src-list="[scope.row.thumb]"></el-image> -->
+						<el-image class="table-td-thumb" :src="imgUrl+scope.row.image"></el-image>
 					</template>
 				</el-table-column>
-				<el-table-column prop="id" label="评分" align="center" width="100"></el-table-column>
-				<el-table-column prop="id" label="评论内容" align="center" width="150"></el-table-column>
+				<el-table-column prop="starRating" label="评分" align="center" width="100"></el-table-column>
+				<el-table-column prop="content" label="评论内容" align="center" width="150"></el-table-column>
 				<el-table-column label="操作" align="center">
 					<template slot-scope="scope">
-						<el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">回复</el-button>
+						<el-button type="danger" size="mini" @click="handleEdit(scope.$index, scope.row)">回复</el-button>
 					</template>
 				</el-table-column>
 			</el-table>
 			<div class="pagination">
-				<el-pagination background layout="total, prev, pager, next" :current-page="query.pageIndex" :page-size="query.pageSize"
-				 :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+				<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10"
+				 @current-change="handlePageChange"></el-pagination>
 			</div>
 		</div>
 
-		<el-dialog title="添加项目" :visible.sync="dialogVisible" width="30%">
-			<div>
-				<div class="handle-box">
-					<el-form ref="form" :model="form" label-width="80px">
-						<el-form-item label="项目名称">
-							<el-input v-model="form.name" placeholder="输入项目名称"></el-input>
-						</el-form-item>
-						<el-form-item label="项目类型">
-							<div>
-								<el-select v-model="form.one" placeholder="默认" class="handle-select mr10">
-									<el-option key="bbk" label="步步高" value="bbk"></el-option>
-									<el-option key="xtc" label="小天才" value="xtc"></el-option>
-									<el-option key="imoo" label="imoo" value="imoo"></el-option>
-								</el-select>
-								<el-select v-model="form.one" placeholder="默认" class="handle-select mr10">
-									<el-option key="bbk" label="步步高" value="bbk"></el-option>
-									<el-option key="xtc" label="小天才" value="xtc"></el-option>
-									<el-option key="imoo" label="imoo" value="imoo"></el-option>
-								</el-select>
-							</div>
-						</el-form-item>
-						<el-form-item label="项目费用">
-							<el-input v-model="form.name" placeholder="输入项目费用"></el-input>
-						</el-form-item>
-						<el-form-item label="费用类型">
-							<div>
-								<el-select v-model="form.one" placeholder="默认">
-									<el-option key="bbk" label="步步高" value="bbk"></el-option>
-									<el-option key="xtc" label="小天才" value="xtc"></el-option>
-									<el-option key="imoo" label="imoo" value="imoo"></el-option>
-								</el-select>
-							</div>
-							<div style="color: #7B7979; font-size: 14px;">
-								<i class="el-icon-lx-info"></i>
-								<span>订单总金额上增加或减少金额</span>
-							</div>
-						</el-form-item>
-						<el-form-item label="关联数量">
-							<div>
-								<el-radio v-model="radio" label="1">是</el-radio>
-								<el-radio v-model="radio" label="2">否</el-radio>
-							 </div>
-							 <div style="color: #7B7979; font-size: 14px;">
-							 	<i class="el-icon-lx-info"></i>
-							 	<span>附加费用=项目费用X购买商品数量</span>
-							 </div>
-						</el-form-item>
-						<el-form-item label="展示类型">
-							<div>
-								<el-select v-model="form.one" placeholder="默认">
-									<el-option key="bbk" label="步步高" value="bbk"></el-option>
-									<el-option key="xtc" label="小天才" value="xtc"></el-option>
-									<el-option key="imoo" label="imoo" value="imoo"></el-option>
-								</el-select>
-							</div>
-							<div style="color: #7B7979; font-size: 14px;">
-								<i class="el-icon-lx-info"></i>
-								<span>APP购物选择规格时项目费用显示方式</span>
-							</div>
-						</el-form-item>
-					</el-form>
+		<el-dialog :close-on-click-modal="false" title="添加项目" :visible.sync="dialogVisible" width="30%" append-to-body>
+			<div class="evaluate_reply">
+				<div>
+					<p class="title">用户评论内容：</p>
+					<p class="txt">{{content.content}}</p>
+				</div>
+				<div>
+					<p class="title">回复用户内容：</p>
+					<div class="txt">
+						<el-input
+						  type="textarea"
+						  :autosize="{ minRows: 4, maxRows: 10}"
+						  placeholder="请输入内容"
+						  v-model="replyTxt">
+						</el-input>
+					</div>
 				</div>
 			</div>
+			
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="dialogVisible = false">取 消</el-button>
-				<el-button type="primary" @click="dialogVisible = false">发 送</el-button>
+				<el-button type="primary" @click="saveEdit">发 送</el-button>
 			</span>
 		</el-dialog>
 
@@ -145,26 +105,41 @@
 
 <script>
 	import {
-		fetchData
+		listShopWaresComment,
+		insertShopWaresCommenreply
 	} from '../../../api/index';
+	import { mapState } from 'vuex'
+	import { dateFormat } from '../../../utils/utils.js'
 	export default {
 		name: 'Inventory_change',
+		computed:{
+		     ...mapState(['accountId','imgUrl']),  //显示state的数据
+		    },
 		data() {
 			return {
-				query: {
-					address: '',
-					name: '',
-					pageIndex: 1,
-					pageSize: 10
-				},
+			
+				page: 1,
+				pageTotal: 0,
+				
 				radio: '1',
 				dialogVisible: false,
 				dialogImageUrl:'',
 				tableData: [],
 				multipleSelection: [],
 				delList: [],
-				pageTotal: 0,
-				form: {},
+				
+				form: {
+					waresName:'',
+					productName:'',
+					starRating:0,
+					starRatingStr:'',
+					reply:0,
+					replyStr:'',
+					startTime:'',
+					endTime:'',
+				},
+				content:'',
+				replyTxt:'', 
 				idx: -1,
 				id: -1,
 				value1: [],
@@ -174,42 +149,88 @@
 			this.getData();
 		},
 		methods: {
+			//回复评论
+			saveEdit(){
+				var query = {
+					data: {
+						commentId: this.content.id,
+						commentUserId: this.content.userId,
+						commentReplyUserId: this.accountId,
+						replyContent: this.replyTxt,
+						replyImg: '',
+					}
+				};
+				insertShopWaresCommenreply(query).then(res => {
+					// console.log(res)
+					if (res.code == 1) {
+						this.$message.success('回复成功');
+						this.dialogVisible = false;
+						this.replyTxt = '';
+						// this.tableData.data.splice(index, 1);
+						this.getData();
+					}
+				});
+			},
+			//评分选择
+			starRatingSelect(data){
+				this.form.starRating = data;
+			},
+			//是否回复选择
+			replySelect(data){
+				this.form.reply = data;
+			},
 			// 获取 easy-mock 的模拟数据
 			getData() {
-				fetchData(this.query).then(res => {
-					console.log(res);
-					this.tableData = res.list;
-					this.pageTotal = res.pageTotal || 50;
+				if(this.value1 != ''){
+					var arr = [];
+					this.value1.map((item, index) => {
+						arr.push(dateFormat("YYYY-mm-dd HH:MM:SS", item))
+					})
+					var startTime = arr[0]
+					var endTime = arr[1]
+				}else{
+					var startTime = '';
+					var endTime = '';
+				};
+				
+				var query = {
+					data: {
+						accountId: this.accountId,
+						waresName: this.form.waresName,
+						productName: this.form.productName,
+						starRating: this.form.starRating,
+						reply:this.form.reply,
+						startTime:startTime,
+						endTime:endTime,
+						
+						nowPage: this.page,
+						pageCount: 6,
+					}
+				};
+				listShopWaresComment(query).then(res => {
+					if (res.code == 1) {
+						this.tableData = res;
+						this.pageTotal = res.allPage;
+					}
 				});
 			},
 			handleEdit(index, row) {
+				this.content = row;
 				this.dialogVisible = true;
 			},
 			// 触发搜索按钮
 			handleSearch() {
-				this.$set(this.query, 'pageIndex', 1);
 				this.getData();
 			},
 			// 多选操作
 			handleSelectionChange(val) {
 				this.multipleSelection = val;
 			},
-			// 删除操作
-			handleDelete(index, row) {
-				// 二次确认删除
-				this.$confirm('确定要删除吗？', '提示', {
-						type: 'warning'
-					})
-					.then(() => {
-						this.$message.success('删除成功');
-						this.tableData.splice(index, 1);
-					})
-					.catch(() => {});
-			},
+	
 
 			// 分页导航
 			handlePageChange(val) {
-				this.$set(this.query, 'pageIndex', val);
+				this.page = val;
 				this.getData();
 			}
 		}
@@ -248,6 +269,14 @@
 		margin: auto;
 		width: 40px;
 		height: 40px;
+	}
+	.evaluate_reply .title{
+		font-size: 15px;
+		font-weight: 600;
+		padding: 10px 0;
+	}
+	.evaluate_reply .txt{
+		padding-bottom: 20px;
 	}
 </style>
 
