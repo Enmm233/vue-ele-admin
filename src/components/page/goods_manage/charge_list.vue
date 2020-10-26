@@ -51,6 +51,7 @@
 			</div>
 			<div class="handle-box">
 				<el-button type="primary" @click="handleAdd">添加</el-button>
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
 				<!-- <el-button type="info">删除</el-button> -->
 			</div>
 			<el-table height="550" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
@@ -256,6 +257,22 @@
 			this.getData();
 		},
 		methods: {
+			refreshData(){
+			   //刷新列表
+			   this.searchForm.name = '';
+			   this.searchForm.type = 0;
+			   this.searchForm.typeStr = '';
+			   this.searchForm.sortNum = 0;
+			   this.searchForm.sortStr = '';
+			   this.searchForm.sortList = '';
+			   this.searchForm.expenseType = 0;
+			   this.searchForm.expenseTypeStr = '';
+			   this.searchForm.showType = 0;
+			   this.searchForm.showTypeStr = '';
+			   this.page = 1;
+			   this.pageTotal = 0;
+			   this.getData();
+			  },
 			//点发送
 			submit(){
 				if(this.form.status == 1){
@@ -482,9 +499,18 @@
 					}
 				};
 				listShopExpenseItem(query).then(res => {
-					if(res.code == 1){
+					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -512,8 +538,9 @@
 						delShopExpenseItem(query).then(res => {
 							if(res.code == 1){
 								this.$message.success('删除成功');
+								this.tableData.data.splice(index, 1);
 								this.getData();
-								// this.tableData.data.splice(index, 1);
+								
 							}
 						});
 					})
@@ -535,7 +562,7 @@
 	}
 
 	.handle-select {
-		width: 120px;
+		width: 120px !important;
 	}
 
 	.handle-input {

@@ -262,14 +262,23 @@
 				});
 			},
 			submitForm() {
-				
 				var mapa = this.$refs.map.mapinfo;
+				if(this.shopStoreCategoryId == ''){
+					var categoryId = 0;
+				}else{
+					var categoryId = this.shopStoreCategoryId;
+				}
+				if(this.storeInfo.chatId == ''){
+					var chatId = 0;
+				}else{
+					var chatId = this.storeInfo.chatId;
+				}
 				var query = {
 					data: {
 						id: this.storeInfo.id,
 						name: this.storeInfo.name,
 						storeStatus: this.storeStatus,
-						categoryId: this.shopStoreCategoryId,
+						categoryId: categoryId,
 						logoImg: this.breviaryUrl,
 						createAccountId: this.accountId,
 						contactsName: this.storeInfo.contactsName,
@@ -278,7 +287,7 @@
 						longitudeLatitude: mapa.map.toString(),
 						contactsIdCard:this.storeInfo.contactsIdCard,
 						webDescribe:this.storeInfo.webDescribe,
-						chatId: this.storeInfo.chatId,
+						chatId: chatId,
 						businessScope: this.storeInfo.businessScope,
 						corporateIdentityCard: this.bannerUrl.toString(),
 						businessLicense: this.posterUrl,
@@ -288,7 +297,6 @@
 				};
 				updStore(query).then(res => {
 					if (res.code == 1) {
-						// console.log(res.data)
 						this.$emit('cancel');
 						this.$emit('addaucceed');
 					}

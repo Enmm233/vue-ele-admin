@@ -4,7 +4,7 @@
 			<div class="ms-title">后台管理系统</div>
 
 			<el-tabs v-model="activeName" @tab-click="handleClick">
-				<el-tab-pane label="账号登录" name="first">
+				<!-- <el-tab-pane label="账号登录" name="first">
 
 					<el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
 						<el-form-item prop="username">
@@ -21,7 +21,7 @@
 							<el-button type="primary" @click="submitForm()">登录</el-button>
 						</div>
 					</el-form>
-				</el-tab-pane>
+				</el-tab-pane> -->
 				<el-tab-pane label="验证码登录" name="second">
 
 					<el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
@@ -31,7 +31,7 @@
 							</el-input>
 						</el-form-item>
 						<el-form-item prop="verification_code" class="code">
-							<el-input v-model="param.verification_code" placeholder="请输入验证码" @keyup.enter.native="submitForm()"></el-input>
+							<el-input v-model="param.verification_code" placeholder="请输入验证码" @keyup.enter.native="subCodeLon()"></el-input>
 							<el-button type="button" @click="sendcode" :disabled="disabled" v-if="disabled==false">发送验证码
 							</el-button>
 							<el-button type="button" @click="sendcode" :disabled="disabled" v-if="disabled==true">{{btntxt}}
@@ -155,7 +155,7 @@
 				codeLogin(query).then(res => {
 					if(res.code == 1){
 						this.$message.success('登录成功');
-						localStorage.setItem('ms_username', res.data.userBaseInfo.nickName);
+						localStorage.setItem('ms_username', res.data.userAccount.nickName);
 						localStorage.setItem('account_id', res.data.userAccount.id);
 						localStorage.setItem('login_id', res.data.userAccount.loginId);
 						this.$router.push('/product_list');

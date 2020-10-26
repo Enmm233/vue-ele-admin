@@ -9,20 +9,19 @@
 					</el-form-item>
 					<el-form-item label="服务分类">
 						<div class="flex flex_wrap">
-							<el-select v-model="classifyOneName" placeholder="请选择" @change="selectOne" class="handle-select mr10">
-								<el-option v-for="(item,index) in classifyOne" :key="item.id" :label="item.name" :value="index">
+							<el-select v-model="contractOne" placeholder="请选择" @change="selectOne" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractOneList" :key="item.id" :label="item.name" :value="index">
 								</el-option>
 							</el-select>
-							<el-select v-model="classifyTwoName" placeholder="请选择" @change="selectTwo" class="handle-select mr10">
-								<el-option v-for="(item,index) in classifyTwo" :key="item.id" :label="item.name" :value="index">
+							<el-select v-model="contractTwo" placeholder="请选择" @change="selectTwo" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractTwoList" :key="item.id" :label="item.name" :value="index">
 								</el-option>
 							</el-select>
-							<el-select v-model="classifyThreeName" placeholder="请选择" @change="selectThree" class="handle-select mr10">
-								<el-option v-for="(item,index) in classifyThree" :key="item.id" :label="item.name" :value="index">
+							<el-select v-model="contractThree" placeholder="请选择" @change="selectThree" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractThreeList" :key="item.id" :label="item.name" :value="index">
 								</el-option>
 							</el-select>
 						</div>
-
 					</el-form-item>
 					<el-form-item label="品牌" label-width="50px">
 						<el-input v-model="brandName" class="pick-input mr10"></el-input>
@@ -37,6 +36,7 @@
 			</div>
 			<div class="handle-box">
 				<el-button type="primary" @click="open">添加</el-button>
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
 				<!-- <el-button type="info" @click="toPage">删除</el-button> -->
 			</div>
 
@@ -45,13 +45,13 @@
 				<el-table-column prop="id" label="服务ID" width="100" align="center"></el-table-column>
 				<el-table-column prop="name" label="服务名称" width="200"></el-table-column>
 				<el-table-column label="创建账号" width="120" align="center">
-					<template slot-scope="scope">￥{{scope.row.createAccountId}}</template>
+					<template slot-scope="scope">{{scope.row.createAccountId}}</template>
 				</el-table-column>
 				<el-table-column label="创建时间" width="120" align="center">
-					<template slot-scope="scope">￥{{scope.row.createTime}}</template>
+					<template slot-scope="scope">{{scope.row.createTime}}</template>
 				</el-table-column>
 				<el-table-column label="服务类别" width="120" align="center">
-					<template slot-scope="scope">￥{{scope.row.categoryName}}</template>
+					<template slot-scope="scope">{{scope.row.categoryName}}</template>
 				</el-table-column>
 				<el-table-column label="服务图片" width="120" align="center">
 					<template slot-scope="scope">
@@ -59,13 +59,13 @@
 					</template>
 				</el-table-column>
 				<el-table-column label="品牌名称" width="120" align="center">
-					<template slot-scope="scope">￥{{scope.row.brandName}}</template>
+					<template slot-scope="scope">{{scope.row.brandName}}</template>
 				</el-table-column>
 				<el-table-column label="收费单位" width="120" align="center">
-					<template slot-scope="scope">￥{{scope.row.unit}}</template>
+					<template slot-scope="scope">{{scope.row.unit}}</template>
 				</el-table-column>
 				<el-table-column label="服务地址" width="120" align="center">
-					<template slot-scope="scope">￥{{scope.row.address}}</template>
+					<template slot-scope="scope">{{scope.row.address}}</template>
 				</el-table-column>
 				<el-table-column label="操作" align="center">
 					<template slot-scope="scope">
@@ -80,24 +80,15 @@
 		</div>
 
 		<!-- 编辑弹出框 -->
-		<el-dialog :close-on-click-modal="false" title="编辑" :visible.sync="editVisible" width="30%">
-		<!-- 	<el-form ref="form" :model="form" label-width="70px">
-				<el-form-item label="用户名">
-					<el-input v-model="form.name"></el-input>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input v-model="form.address"></el-input>
-				</el-form-item>
-			</el-form> -->
-			<span slot="footer" class="dialog-footer">
-				<el-button @click="editVisible = false">取 消</el-button>
-				<el-button type="primary" @click="saveEdit">确 定</el-button>
-			</span>
+		<el-dialog :close-on-click-modal="false" title="编辑" :visible.sync="editProduct" width="80%">
+			<div>
+				<editServices ref="child" :shopProductId="shopProductId" :editProduct="editProduct" @editProductCil="editProductCil"></editServices>
+			</div>
 		</el-dialog>
 		<!-- 添加弹出框 -->
 		<el-dialog :close-on-click-modal="false" title="添加服务" :visible.sync="addProduct" width="80%">
 			<div>
-				<add-services></add-services>
+				<add-services :addProduct="addProduct" @addProductCil="addProductCil"></add-services>
 			</div>
 		</el-dialog>
 	</div>
@@ -109,7 +100,8 @@
 	} from 'vuex'
 	import {
 		listShopService,
-		delShopService
+		delShopService,
+		getMerchandiseCategories
 	} from '../../../api/index';
 	import addServices from '../../common/services/add_services.vue'
 	import editServices from '../../common/services/edit_services.vue'
@@ -125,22 +117,22 @@
 		data() {
 			return {
 				serviceName:'', //服务名称
-				categoryId:0, //服务分类ID
-				classifyOne: '', //分类一
-				classifyOneName: '',
-				classifyTwo: '', //分类二
-				classifyTwoName: '',
-				classifyThree: '', //分类三
-				classifyThreeName: '',
+				categoryId:0,
+				contractOne:'',
+				contractOneList:[],
+				contractTwo:'',
+				contractTwoList:[],
+				contractThree:'',
+				contractThreeList:[],
 				brandName:'', //品牌名
 				address:'', //地址
 				page: 1,
 				pageTotal: 0,
 				addProduct:false,
+				editProduct:false,
 				tableData: [],
-				
+				shopProductId:'',
 				delList: [],
-				editVisible: false,
 				
 				form: {},
 				idx: -1,
@@ -149,60 +141,78 @@
 			};
 		},
 		created() {
+			this.productCategory();
 			this.getData();
 		},
 		methods: {
+			refreshData(){
+				//刷新列表
+				this.serviceName = '';
+				this.brandName = '';
+				this.address = '';
+				this.categoryId = 0;
+				this.contractOne = '';
+				this.contractOneList = [];
+				this.contractTwo = '';
+				this.contractTwoList = [];
+				this.contractThree = '';
+				this.contractThreeList = [];
+				this.page = 1;
+				this.pageTotal = 0;
+				this.getData();
+				this.productCategory();
+			},
 			// 获取产品分类
 			productCategory() {
 				var query = {
 					data: {
-						parentId: 0
+						waresType: 2
 					}
 				};
-				shopProductCategoryt(query).then(res => {
-					console.log(res)
+				getMerchandiseCategories(query).then(res => {
 					if (res.code == 1) {
-						this.classifyOne = res.data
+						this.contractOneList = res.data
 					}
 				});
 			},
-			selectOne(e) {
-				var query = {
-					data: {
-						parentId: this.classifyOne[e].id
-					}
-				};
-				shopProductCategoryt(query).then(res => {
-					this.classifyId = this.classifyOne[e].id;
-					if (res.code == 1) {
-						this.classifyTwo = res.data
-					}else{
-						this.classifyTwo = ''; //分类二
-						this.classifyTwoName = '';
-						this.classifyThree = ''; //分类三
-						this.classifyThreeName = '';
-					}
-				});
-				
+			selectOne(index){
+				//选择一级
+				this.categoryId = this.contractOneList[index].id;
+				this.contractTwoList = this.contractOneList[index].kidList;
+				// console.log(this.categoryId)
 			},
-			selectTwo(e) {
-				var query = {
-					data: {
-						parentId: this.classifyTwo[e].id
-					}
-				};
-				shopProductCategoryt(query).then(res => {
-					this.classifyId = this.classifyTwo[e].id;
-					if (res.code == 1) {
-						this.classifyThree = res.data
-					}else{
-						this.classifyThree = ''; //分类三
-						this.classifyThreeName = '';
-					}
-				});
+			selectTwo(index){
+				//选择二级
+				this.categoryId = this.contractTwoList[index].id;
+				this.contractThreeList = this.contractTwoList[index].kidList;
+				// console.log(this.categoryId)
 			},
-			selectThree(e) {
-				this.classifyId = this.classifyThree[e].id;
+			selectThree(index){
+				//选择三级
+				this.categoryId = this.contractThreeList[index].id;
+				// console.log(this.categoryId)
+			},
+			addProductCil(data) { //添加
+				this.addProduct = !data.addProduct;
+				if (data.type == "成功") {
+					this.serviceName = '';
+					this.brandName = '';
+					this.address = '';
+					this.classifyId = 0;
+					this.$message.success('添加成功');
+					this.getData();
+				}
+			},
+			editProductCil(data) { //编辑
+				this.editProduct = !data.editProduct;
+				if (data.type == "成功") {
+					this.serviceName = '';
+					this.brandName = '';
+					this.address = '';
+					this.classifyId = 0;
+					this.$message.success('修改成功');
+					this.getData();
+				}
 			},
 			handleChange(value) {
 				console.log(label);
@@ -235,8 +245,17 @@
 				};
 				listShopService(query).then(res => {
 					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -257,10 +276,9 @@
 							}
 						};
 						delShopService(query).then(res => {
-							console.log(res)
 							if (res.code == 1) {
 								this.$message.success('删除成功');
-								// this.tableData.data.splice(index, 1);
+								this.tableData.data.splice(index, 1);
 								this.getData();
 							}
 						});
@@ -284,16 +302,19 @@
 			},
 			// 编辑操作
 			handleEdit(index, row) {
-				this.idx = index;
-				this.form = row;
-				this.editVisible = true;
+				// this.idx = index;
+				this.shopProductId = row.id;
+				this.editProduct = true;
+				if(this.$refs.child){
+					this.$refs.child.getProduct(row.id);
+				}
 			},
 			// 保存编辑
-			saveEdit() {
-				this.editVisible = false;
-				this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-				this.$set(this.tableData, this.idx, this.form);
-			},
+			// saveEdit() {
+			// 	this.editVisible = false;
+			// 	this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+			// 	this.$set(this.tableData, this.idx, this.form);
+			// },
 			// 分页导航
 			handlePageChange(val) {
 				this.page = val;

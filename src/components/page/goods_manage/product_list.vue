@@ -74,7 +74,7 @@
 				</el-table-column>
 				<el-table-column label="操作" align="center">
 					<template slot-scope="scope">
-						<el-button type="primary" size="mini" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button>
+						<el-button v-if="scope.row.flag == 0" type="primary" size="mini" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button>
 						<el-button type="success" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 						<el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
 					</template>
@@ -97,15 +97,15 @@
 
 		<!-- 入库弹出框 -->
 		<el-dialog title="产品入库" :close-on-click-modal="false" :visible.sync="editVisible3" width="20%">
-			<el-form ref="form" :model="form" label-width="70px">
+			<el-form label-width="70px">
 				<el-form-item label="产品名称">
-					<span>fjsdfjdfk</span>
+					<span>{{form.name}}</span>
 				</el-form-item>
 				<el-form-item label="商品批次">
-					<el-input v-model="form.batch"></el-input>
+					<span>{{batch}}</span>
 				</el-form-item>
 				<el-form-item label="入库数量">
-					<el-input type="number" v-model="form.putStorageNum"></el-input>
+					<el-input type="number" v-model="putStorageNum"></el-input>
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -124,14 +124,15 @@
 		fetchData,
 		shopProductCategoryt,
 		getShopProductList,
-		delShopProduct
+		delShopProduct,
+		addShopWarehousing
 	} from '../../../api/index';
 	import addProduct from '../../common/addGoods/add_product.vue'
 	import editProduct from '../../common/addGoods/edit_product.vue'
 	export default {
 		name: 'basetable',
 		computed:{
-		     ...mapState(['accountId','imgUrl']),  //显示state的数据
+		     ...mapState(['accountId','imgUrl','msUsername']),  //显示state的数据
 		    },
 		components: {
 			addProduct,
@@ -152,6 +153,8 @@
 				page: 1,
 				pageTotal: 0,
 				form: '',
+				batch:'', //批次
+				putStorageNum:'', //入库数量
 				tableData: '',
 				multipleSelection: [],
 				delList: [],
@@ -240,13 +243,40 @@
 			},
 			//显示入库
 			headlePutStorage(index, row) {
+				this.form = row;
+				this.batch = Date.parse(new Date());
+				// putStorageNum
 				this.editVisible3 = true;
 			},
 			//入库
-			putStorage(index, row) {
-				this.editVisible3 = false;
-				// addShopWarehousing
-				this.$message.success("入库");
+			putStorage() {
+				if(this.putStorageNum == ''){
+					this.$message.error("请输入入库数量");
+					return
+				}
+				if(this.putStorageNum < 0){
+					this.$message.error("入库数量不能为负数");
+					return
+				}
+				var query = {
+					data: {
+						productId: this.form.id,
+						productName: this.form.name,
+						productUnit: this.form.unit,
+						warehousingNum: this.putStorageNum,
+						warehousingBatch: this.batch,
+						warehousingAccount: this.msUsername,
+						accountId: localStorage.getItem('account_id'),
+					}
+				};
+				addShopWarehousing(query).then(res => {
+					if (res.code == 1) {
+						this.editVisible3 = false;
+						this.putStorageNum = '';
+						this.$message.success("入库成功");
+						this.getData();
+					}
+				});
 			},
 			selectOne(e) {
 				var query = {
@@ -291,7 +321,7 @@
 				var query = {
 					data: {
 						// accountId:localStorage.getItem('account_id'),
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						productName: this.productName,
 						brand: this.brand,
 						placeOrigin: this.origin,
@@ -302,9 +332,17 @@
 				};
 				getShopProductList(query).then(res => {
 					if (res.code == 1) {
-						this.$message.success('加载成功');
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -338,7 +376,7 @@
 							// console.log(res)
 							if (res.code == 1) {
 								this.$message.success('删除成功');
-								// this.tableData.data.splice(index, 1);
+								this.tableData.data.splice(index, 1);
 								this.getData();
 							}
 						});

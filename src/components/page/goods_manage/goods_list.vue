@@ -32,7 +32,6 @@
 								</el-select>
 							</div>
 						</el-form-item>
-
 					</el-form>
 					<div>
 						<el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -51,10 +50,12 @@
 								</el-select>
 							</div>
 						</el-form-item>
+						
 					</el-form>
 				</div>
 				<div class="handle-box paddingB15 paddingT15">
 					<el-button type="primary" @click="open">添加</el-button>
+					<el-button type="success" @click="refreshData">刷新列表</el-button>
 					<!-- <el-button type="success">上架</el-button> -->
 					<!-- <el-button type="warning">下架</el-button> -->
 					<!-- <el-button type="info">删除</el-button> -->
@@ -66,7 +67,8 @@
 					<el-table-column prop="waresName" label="商品名称" align="center"></el-table-column>
 					<el-table-column label="商品图片" align="center">
 						<template slot-scope="scope">
-							<el-image class="table-td-thumb" :src="imgUrl+scope.row.waresFirstImg" @click.stop="handleClickItem" :preview-src-list="scope.row.waresImg"></el-image>
+							<el-image class="table-td-thumb" :src="imgUrl+scope.row.waresFirstImg" @click.stop="handleClickItem"
+							 :preview-src-list="scope.row.waresImg"></el-image>
 						</template>
 					</el-table-column>
 					<el-table-column prop="categoryName" label="商品分类" align="center"></el-table-column>
@@ -107,10 +109,10 @@
 							<el-button class="ssmall_btn" style="background-color: #D500F9;" @click="handleEvaluate(scope.$index, scope.row)">评论</el-button>
 							<el-button class="ssmall_btn" style="background-color: #3B50F7;" v-if="scope.row.saleState == 1" @click="soldOut(scope.$index, scope.row)">下架</el-button>
 							<el-button class="ssmall_btn" style="background-color: #3B50F7;" v-if="scope.row.saleState == 2" @click="putaway(scope.$index, scope.row)">上架</el-button>
-							<el-button class="ssmall_btn" style="background-color: #30BB40;" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+							<el-button class="ssmall_btn" style="background-color: #30BB40;" v-if="scope.row.saleState != 1" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 							<el-button class="ssmall_btn" style="background-color: #F76262;" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
 							<el-button class="ssmall_btn" style="background-color: #FFEA00;" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button>
-							<el-button class="ssmall_btn" style="background-color: #1DE9B6;" @click="handleDelete(scope.$index, scope.row)">生产二维码</el-button>
+							<el-button class="ssmall_btn" style="background-color: #1DE9B6;" @click="handleQR(scope.$index, scope.row)">生产二维码</el-button>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -138,7 +140,7 @@
 
 			<!-- 评论弹出框 -->
 			<el-dialog :close-on-click-modal="false" title="评论列表" :visible.sync="editVisible1" width="80%">
-				<evaluate-list :id="goodsId"></evaluate-list>
+				<evaluate-list ref="child" :id="goodsId"></evaluate-list>
 				<span slot="footer" class="dialog-footer">
 					<el-button @click="editVisible1 = false">取 消</el-button>
 					<el-button type="primary" @click="saveEdit">确 定</el-button>
@@ -153,10 +155,19 @@
 
 			<!-- 入库弹出框 -->
 			<el-dialog :close-on-click-modal="false" title="商品入库" :visible.sync="editVisible3" width="50%">
-				<goods-warehousing></goods-warehousing>
+				<goods-warehousing ref="childput" :id="goodsId"></goods-warehousing>
 				<span slot="footer" class="dialog-footer">
 					<el-button @click="editVisible3 = false">取 消</el-button>
 					<el-button type="primary" @click="putStorage">确 定</el-button>
+				</span>
+			</el-dialog>
+			
+			<!-- 二维码弹出框 -->
+			<el-dialog :close-on-click-modal="false" title="商品入库" :visible.sync="editVisible4" width="50%">
+				<goods-qr ref="childqr" :id="goodsId"></goods-qr>
+				<span slot="footer" class="dialog-footer">
+					<el-button @click="editVisible4 = false">取 消</el-button>
+					<el-button type="primary" @click="print">打 印</el-button>
 				</span>
 			</el-dialog>
 		</div>
@@ -169,24 +180,31 @@
 		getShopWaresInfo,
 		ceaseSale,
 		sale,
-		delShopWares
+		delShopWares,
+		addShopHousing
 	} from '../../../api/index';
 	import select from '../../../../public/select.json'
 	import goodsDetail from '../../common/addGoods/goods_detail.vue';
 	import evaluateList from '../../common/evaluate/evaluate_list.vue';
 	import goodsWarehousing from '../../common/addGoods/goods_warehousing.vue';
-	import { mapState } from 'vuex'
+	import goodsQr from '../../common/addGoods/goods_qr.vue';
+	import {
+		mapState
+	} from 'vuex'
 	import util from '../../../utils/util.js'
-	import { getNowFormatDate } from '../../../utils/utils.js'
+	import {
+		getNowFormatDate
+	} from '../../../utils/utils.js'
 	export default {
 		name: 'goodsList',
-		computed:{
-		     ...mapState(['imgUrl','accountId']),  //显示state的数据
-		    },
+		computed: {
+			...mapState(['URL','imgUrl', 'accountId', 'msUsername']), //显示state的数据
+		},
 		components: {
 			goodsDetail,
 			evaluateList,
-			goodsWarehousing
+			goodsWarehousing,
+			goodsQr
 		},
 		data() {
 			return {
@@ -198,7 +216,6 @@
 				classifyThree: '', //分类三
 				classifyThreeName: '',
 				waresName: '', //商品名称
-
 				saleStateStr: '', //上架状态
 				saleState: 0, //上架状态
 				saleList: select.saleList, //上架状态
@@ -210,9 +227,9 @@
 
 				page: 1,
 				pageTotal: 0,
-				
-				goodsId:'',
-				
+
+				goodsId: '',
+
 				query: {
 					address: '',
 					name: '',
@@ -226,6 +243,7 @@
 				editVisible1: false,
 				editVisible2: false,
 				editVisible3: false,
+				editVisible4: false,
 				pageTotal: 0,
 				form: {},
 				idx: -1,
@@ -236,7 +254,7 @@
 			'$route.path': function(newVal, oldVal) {
 				if (this.$route.query.status == 1) {
 					this.getData();
-					util.$emit('demo','msg');
+					// util.$emit('demo','msg');
 				}
 			}
 		},
@@ -245,6 +263,26 @@
 			this.productCategory();
 		},
 		methods: {
+			refreshData() {
+				//刷新列表
+				this.classifyId = 0;
+				this.classifyOne = '';
+				this.classifyOneName = '';
+				this.classifyTwo = '';
+				this.classifyTwoName = '';
+				this.classifyThree = '';
+				this.classifyThreeName = '';
+				this.waresName = '';
+				this.saleStateStr = '';
+				this.saleState = 0;
+				this.serviceName = '';
+				this.waresTypeStr = '';
+				this.waresType = 0;
+				this.page = 1;
+				this.pageTotal = 0;
+				this.getData();
+				this.productCategory();
+			},
 			handleClickItem() {
 				// 获取遮罩层dom
 				var domImageMask = '';
@@ -285,13 +323,13 @@
 					if (res.code == 1) {
 						this.classifyId = this.classifyOne[e].id;
 						this.classifyTwo = res.data
-					}else{
+					} else {
 						this.classifyTwo = ''; //分类二
 						this.classifyTwoName = '';
 						this.classifyThree = ''; //分类三
 						this.classifyThreeName = '';
 					}
-					
+
 				});
 
 			},
@@ -306,7 +344,7 @@
 					if (res.code == 1) {
 						this.classifyId = this.classifyTwo[e].id;
 						this.classifyThree = res.data
-					}else{
+					} else {
 						this.classifyThree = ''; //分类三
 						this.classifyThreeName = '';
 					}
@@ -338,19 +376,29 @@
 					}
 				};
 				getShopWaresInfo(query).then(res => {
+
 					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						var arr = [];
-						for(var i=0;i<res.data.length;i++){
+						for (var i = 0; i < res.data.length; i++) {
 							res.data[i].waresImg = res.data[i].waresImg.split(',');
 						}
 						res.data.map(item => {
 							var val = item.waresImg;
-							val.map((i,index) =>{
+							val.map((i, index) => {
 								val[index] = this.imgUrl + i;
 							})
 						})
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					} else if (res.code == 2) {
+						if (res.data.length > 0) {
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						} else {
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -364,21 +412,7 @@
 				this.page = 1;
 				this.getData();
 			},
-			
-			// arr:[
-			// 	{
-			// 		aaa:[
-			// 			'1','2','3'
-			// 		]
-			// 	},
-			// 	{
-			// 		aaa:[
-			// 			'4','5','6'
-			// 		]
-			// 	},
-				
-			// ],
-			
+
 			tableRowClassName({ //行变色
 				row,
 				rowIndex
@@ -401,12 +435,68 @@
 			},
 			//显示入库
 			headlePutStorage(index, row) {
+				this.goodsId = row.id;
 				this.editVisible3 = true;
+				if (this.$refs.childput) {
+					this.$refs.childput.getData(row.id);
+				}
+			},
+			//显示二维码
+			handleQR(index, row) {
+				this.goodsId = row.id;
+				this.editVisible4 = true;
+				if (this.$refs.childqr) {
+					this.$refs.childqr.getData(row.id);
+				}
+			},
+			print(){
+				//打印
 			},
 			//入库
-			putStorage(index, row) {
-				this.editVisible3 = false;
-				this.$message.success("入库");
+			putStorage() {
+				if (this.$refs.childput) {
+					if (this.$refs.childput.selectArr == "") {
+						this.$message.error('请选择规格');
+						return
+					}
+					if (this.$refs.childput.inventory == "") {
+						this.$message.error('请输入库存数');
+						return
+					}
+					var spec = this.$refs.childput.selectArr;
+					var arr = [];
+					for (let index in spec) {
+						arr.push(spec[index].name)
+					}
+					if (this.$refs.childput.arrTitle != '') {
+						var warehousingBatch = this.$refs.childput.arrTitle.toString();
+					} else {
+						var warehousingBatch = '';
+					}
+					if (this.$refs.childput.inventory != '') {
+						var inventory = this.$refs.childput.inventory;
+					} else {
+						var inventory = 0;
+					}
+					var query = {
+						data: {
+							waresId: this.$refs.childput.goodsInfo.id,
+							specifications: arr.toString(),
+							warehousingBatch: warehousingBatch,
+							waresName: this.$refs.childput.goodsInfo.waresName,
+							waresUnit: this.$refs.childput.goodsInfo.waresCompany,
+							warehousingNum: inventory,
+							warehousingAccount: this.msUsername,
+							accountId: this.accountId,
+						}
+					};
+					addShopHousing(query).then(res => {
+						if (res.code == 1) {
+							this.editVisible3 = false;
+							this.$message.success("入库成功");
+						}
+					});
+				}
 			},
 
 
@@ -426,7 +516,7 @@
 							// console.log(res)
 							if (res.code == 1) {
 								this.$message.success('删除成功');
-								// this.tableData.data.splice(index, 1);
+								this.tableData.data.splice(index, 1);
 								this.getData();
 							}
 						});
@@ -443,7 +533,7 @@
 					path: '/add_goods',
 					query: {
 						type: 2,
-						id:row.id
+						id: row.id
 					}
 				})
 			},
@@ -451,6 +541,9 @@
 			handleEvaluate(index, row) {
 				this.goodsId = row.id;
 				this.editVisible1 = true;
+				if (this.$refs.child) {
+					this.$refs.child.getData(row.id);
+				}
 			},
 			// 查看操作
 			handleExamine(index, row) {
@@ -464,7 +557,7 @@
 				this.$set(this.tableData, this.idx, this.form);
 			},
 			//下架
-			soldOut(index, row){
+			soldOut(index, row) {
 				this.$confirm('确定要下架吗？', '提示', {
 						type: 'warning'
 					})
@@ -484,7 +577,7 @@
 					.catch(() => {});
 			},
 			//上架
-			putaway(index, row){
+			putaway(index, row) {
 				this.$confirm('确定要上架吗？', '提示', {
 						type: 'warning'
 					})
@@ -492,8 +585,8 @@
 						var query = {
 							data: {
 								waresId: row.id,
-								saleTime:getNowFormatDate(),
-								saleDuration:0
+								saleTime: getNowFormatDate(),
+								saleDuration: 0
 							}
 						};
 						sale(query).then(res => {
@@ -504,7 +597,7 @@
 						});
 					})
 					.catch(() => {});
-				
+
 			},
 
 		}
@@ -517,7 +610,7 @@
 	}
 
 	.handle-select {
-		width: 120px;
+		width: 120px !important;
 	}
 
 	.handle-input {

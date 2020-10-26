@@ -29,6 +29,9 @@
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
 				</div>
             </div>
+			<div class="handle-box">
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
+			</div>
             <el-table
 				height="600"
                 :data="tableData.data"
@@ -88,6 +91,15 @@ export default {
         this.getData();
     },
     methods: {
+		refreshData(){
+			//刷新列表
+			this.form.productName = '';
+			this.form.warehousingBatch = '';
+			this.value1 = [];
+			this.page = 1;
+			this.pageTotal = 0;
+			this.getData();
+		},
 		time(e){
 			var arr = [];
 			e.map((item, index) => {
@@ -112,9 +124,18 @@ export default {
 				}
 			};
 			listShopWarehousing(query).then(res => {
-				if(res.code == 1){
+				if (res.code == 1) {
+					// this.$message.success('加载成功');
 					this.tableData = res;
 					this.pageTotal = res.allPage;
+				}else if(res.code == 2){
+					if(res.data.length > 0){
+						this.tableData = res;
+						this.pageTotal = res.allPage;
+					}else{
+						this.tableData = [];
+						this.pageTotal = 0;
+					}
 				}
 			});
 

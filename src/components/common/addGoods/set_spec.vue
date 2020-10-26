@@ -11,7 +11,7 @@
 			  <div class="flex flex_item_center">
 				  <div class="spec">
 				  	<div>
-				  		<el-button @click="isShow = true" type="primary">添加主规格</el-button>
+				  		<el-button style="margin-bottom: 20px;" @click="isShow = true" type="primary">添加主规格</el-button>
 				  		<div class="spec_right">
 				  			<div v-for="(item,index) in oneList">
 				  				<div class="f_item flex flex_item_between">
@@ -151,7 +151,7 @@
 				unit:'',   //商品单位
 				weight:'',   //商品重量
 				size:'',   //商品尺寸
-				inventory:'',   //库存数量
+				inventory:0,   //库存数量
 				oneList: [],
 				number: '',
 				ind: '',
@@ -307,7 +307,7 @@
 							}
 						}if(index3 >= 0){
 							if(index3 == 0){
-								this.oneList[index].shopWaresSpec.shopWaresSpecItems[index2].shopWaresSpecItemItems = '';
+								this.oneList[index].shopWaresSpec.shopWaresSpecItems[index2].shopWaresSpecItemItems = [];
 								// console.log(JSON.stringify(this.oneList))
 							}else if(index3 > 0){
 								this.oneList[index].shopWaresSpec.shopWaresSpecItems[index2].shopWaresSpecItemItems.splice(index3,1);

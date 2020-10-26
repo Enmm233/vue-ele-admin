@@ -48,36 +48,17 @@
 							<img width="100%" :src="brandImg" alt="">
 						</el-dialog>
 					</el-form-item>
-				
-		<!-- 			<el-form-item label="服务图片">
-						<div>图片大小不能超过3M 建议尺寸：1080*900像素</div>
-						<el-upload action="" list-type="picture-card" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-							<i class="el-icon-plus"></i>
-						</el-upload>
-						<el-dialog :visible.sync="dialogVisible">
-							<img width="100%" :src="dialogImageUrl" alt="">
-						</el-dialog>
-					</el-form-item>
-					<el-form-item label="品牌图片">
-						<div>图片大小不能超过3M 建议尺寸：1080*900像素</div>
-						<el-upload action="" list-type="picture-card" :on-preview="handlePictureCardPreview" :on-remove="handleRemove">
-							<i class="el-icon-plus"></i>
-						</el-upload>
-						<el-dialog :visible.sync="dialogVisible">
-							<img width="100%" :src="dialogImageUrl" alt="">
-						</el-dialog>
-					</el-form-item> -->
 				</div>
-				
 				<div class="form-box add_form">
 					<el-form-item label="品牌名称" class="big-input">
-						<el-input v-model="brandName" placeholder="请输入产品名称"></el-input>
+						<el-input v-model="brandName" placeholder="请输入品牌名称"></el-input>
 					</el-form-item>
 					<el-form-item label="收费单位">
-						<el-select v-model="unit" placeholder="选择产品单位">
+						<el-input v-model="unit" placeholder="请输入收费单位"></el-input>
+					<!-- 	<el-select v-model="unit" placeholder="选择产品单位">
 							<el-option v-for="(item,index) in unitList" :key="item.name" :label="item.name" :value="item.name">
 							</el-option>
-						</el-select>
+						</el-select> -->
 					</el-form-item>
 					<el-form-item label="服务时间" class="big-input">
 						<div class="block">
@@ -91,35 +72,35 @@
 							</el-date-picker>
 						</div>
 					</el-form-item>
-					<el-form-item label="服务地址" class="big-input">
+				<!-- 	<el-form-item label="服务地址" class="big-input">
 						<div class="block">
-							<el-cascader v-model="address" :options="city" @change="handleChange"></el-cascader>
+							<el-cascader v-model="address" :options="city" :props="optionProps" @change="handleChange"></el-cascader>
 						</div>
-					</el-form-item>
-					<el-form-item label="详细地址" class="big-input">
-						<el-input type="textarea" v-model="ruleForm.desc"></el-input>
+					</el-form-item> -->
+					<el-form-item label="服务地址" class="big-input">
+						<el-input type="textarea" v-model="detail"></el-input>
 					</el-form-item>
 					<el-form-item label="服务方式">
-						<el-select v-model="ruleForm.region" placeholder="默认">
-							<el-option label="到店服务" value="shanghai"></el-option>
-							<el-option label="上门服务" value="beijing"></el-option>
+						<el-select v-model="serviceTypeStr" placeholder="默认" @change="serviceTypeCil">
+							<el-option label="到店服务" value="1"></el-option>
+							<el-option label="上门服务" value="2"></el-option>
 						</el-select>
 					</el-form-item>
 					<el-form-item label="服务描述" class="big-input">
-						<el-input type="textarea" v-model="ruleForm.desc"></el-input>
+						<el-input type="textarea" v-model="serviceDescribe"></el-input>
 					</el-form-item>
 					<el-form-item label="服务清单" class="big-input">
-						<el-input type="textarea" v-model="ruleForm.desc"></el-input>
+						<el-input type="textarea" v-model="serviceList"></el-input>
 					</el-form-item>
 					<el-form-item label="服务协议" class="big-input">
-						<el-input type="textarea" v-model="ruleForm.desc"></el-input>
+						<el-input type="textarea" v-model="contract"></el-input>
 					</el-form-item>
 					<el-form-item label="服务人员" class="big-input">
-						<el-input type="textarea" v-model="ruleForm.desc"></el-input>
+						<el-input type="number" v-model="personNumber"></el-input>
 					</el-form-item>
 	
 					<el-form-item class="add_btn">
-						<el-button type="primary" @click="submitForm('ruleForm')">保存</el-button>
+						<el-button type="primary" @click="submitForm">保存</el-button>
 						<el-button @click="resetForm('ruleForm')">取消</el-button>
 					</el-form-item>
 				</div>
@@ -168,8 +149,8 @@
 					resource: '',
 					desc: ''
 				},
-				
-				contractId:0,
+				name:'',
+				categoryId:0,
 				contractOne:'',
 				contractOneList:[],
 				contractTwo:'',
@@ -177,8 +158,17 @@
 				contractThree:'',
 				contractThreeList:[],
 				serviceTime:[],
+				brandName:'',
 				unit: '', //单位
 				unitList: select.unitList, //单位列表
+				// address:'',
+				detail:'',
+				serviceType:0,
+				serviceTypeStr:'',
+				serviceDescribe:'',
+				serviceList:'',
+				contract:'',
+				personNumber:'',
 			};
 		},
 		created() {
@@ -202,20 +192,23 @@
 			},
 			selectOne(index){
 				//选择一级
-				this.contractId = this.contractOneList[index].id;
+				this.categoryId = this.contractOneList[index].id;
+				this.contractOne = this.contractOneList[index].name;
 				this.contractTwoList = this.contractOneList[index].kidList;
-				console.log(this.contractId)
+				// console.log(this.categoryId)
 			},
 			selectTwo(index){
 				//选择二级
-				this.contractId = this.contractTwoList[index].id;
+				this.categoryId = this.contractTwoList[index].id;
+				this.contractTwo = this.contractTwoList[index].name;
 				this.contractThreeList = this.contractTwoList[index].kidList;
-				console.log(this.contractId)
+				// console.log(this.categoryId)
 			},
 			selectThree(index){
 				//选择三级
-				this.contractId = this.contractThreeList[index].id;
-				console.log(this.contractId)
+				this.categoryId = this.contractThreeList[index].id;
+				this.contractThree = this.contractThreeList[index].name;
+				// console.log(this.categoryId)
 			},
 			
 			sendDate(e) {
@@ -223,19 +216,153 @@
 					this.serviceTime.push(dateFormat("YYYY-mm-dd HH:MM:SS", item))
 				})
 			},
-			submitForm(formName) {
-				this.$refs[formName].validate((valid) => {
-					if (valid) {
-						alert('submit!');
-					} else {
-						console.log('error submit!!');
-						return false;
+			handleChange(e){
+				//选择地址
+				console.log(e)
+			},
+			serviceTypeCil(e){
+				//选择服务类型
+				this.serviceType = e;
+				// console.log(this.serviceType)
+			},
+			
+			
+			submitForm() { //确认添加
+				if(this.name == ''){
+					this.$message.error('服务名称不能为空');
+					return;
+				}
+				if(this.contractOne == ''){
+					this.$message.error('服务大类不能为空');
+					return;
+				}
+				if(this.contractTwo == ''){
+					this.$message.error('服务二类不能为空');
+					return;
+				}
+				if(this.contractThree == ''){
+					this.$message.error('服务三类不能为空');
+					return;
+				}
+				if(this.productUrl == ''){
+					this.$message.error('服务图片不能为空');
+					return;
+				}
+				if(this.personNumber < 0){
+					this.$message.error('服务人员不能为负数');
+					return;
+				}
+				if(this.serviceTime != ''){
+					var time = this.serviceTime.toString()
+				}else{
+					var time = '';
+				}
+				var query = {
+					data: {
+						createAccountId: this.accountId, //创建用户编号
+						name:this.name,
+						categoryId:this.categoryId,
+						chargeMethodId:0,
+						serviceDescribe:this.serviceDescribe,
+						serviceType:this.serviceType,
+						address:this.detail,
+						longitudeLatitude:'',
+						materielId:'',
+						duration:'',
+						personNumber:this.personNumber,
+						companyId:'',
+						tel:'',
+						serviceTime:time,
+						contract:this.contract,
+						serviceImg:this.productUrl,
+						contractId:0,
+						serviceList:this.serviceList,
+						brandImg:this.brandUrl,
+						brandName:this.brandName,
+						unit:this.unit,
+					}
+				};
+				addShopService(query).then(res => {
+					if (res.code == 1) {
+						this.productImg = ''; //预览产品图片路径
+						this.productUrl = ''; //后台返回的产品图片路径
+						this.productList = [];
+						this.showProductImg = false; //是否显示产品图片预览
+										
+						this.brandImg = ''; //预览品牌图片路径
+						this.brandUrl = ''; //后台返回的品牌图片路径
+						this.brandList = [];
+						this.showBrandImg = false; //是否显示品牌图片预览
+						this.name = '';
+						this.categoryId = 0;
+						this.contractOne = '';
+						this.contractTwo = '';
+						this.contractTwoList = [];
+						this.contractThree = '';
+						this.contractThreeList = [];
+						this.serviceTime = [];
+						this.brandName = '';
+						this.unit = '';
+						this.detail = '';
+						this.serviceType = 0;
+						this.serviceTypeStr = '';
+						this.serviceDescribe = '';
+						this.serviceList = '';
+						this.contract = '';
+						this.personNumber = '';
+						var data = {
+							type: "成功",
+							addProduct: this.addProduct
+						}
+						this.$emit('addProductCil', data);
 					}
 				});
 			},
 			
-			resetForm(formName) {
-				this.$refs[formName].resetFields();
+			resetForm() {
+				this.$confirm('此操作将清空输入内容, 是否继续?', '提示', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					type: 'warning'
+				}).then(() => {
+					this.productImg = ''; //预览产品图片路径
+					this.productUrl = ''; //后台返回的产品图片路径
+					this.productList = [];
+					this.showProductImg = false; //是否显示产品图片预览
+				
+					this.brandImg = ''; //预览品牌图片路径
+					this.brandUrl = ''; //后台返回的品牌图片路径
+					this.brandList = [];
+					this.showBrandImg = false; //是否显示品牌图片预览
+					this.name = '';
+					this.categoryId = 0;
+					this.contractOne = '';
+					this.contractTwo = '';
+					this.contractTwoList = [];
+					this.contractThree = '';
+					this.contractThreeList = [];
+					this.serviceTime = [];
+					this.brandName = '';
+					this.unit = '';
+					this.address = '';
+					this.detail = '';
+					this.serviceType = 0;
+					this.serviceTypeStr = '';
+					this.serviceDescribe = '';
+					this.serviceList = '';
+					this.contractId = '';
+					this.personNumber = '';
+					var data = {
+						type: "取消",
+						addProduct: this.addProduct
+					}
+					this.$emit('addProductCil', data);
+				}).catch(() => {
+					this.$message({
+						type: 'info',
+						message: '已取消操作'
+					});
+				});
 			},
 			productSuccess(res, file) { //产品图片上传成功
 				this.productUrl = res.data;

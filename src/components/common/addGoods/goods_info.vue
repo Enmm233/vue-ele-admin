@@ -14,7 +14,7 @@
 							</div>
 						</el-form-item>
 						
-						<el-form-item label="产品分类">
+						<el-form-item label="产品分类" v-if="goodsType == '产品'">
 							<div class="flex flex_wrap">
 								<el-select v-model="form.classifyOneName" placeholder="请选择" @change="selectOne" class="handle-select mr10">
 									<el-option v-for="(item,index) in form.classifyOne" :key="item.id" :label="item.name" :value="index">
@@ -30,12 +30,26 @@
 								</el-select>
 							</div>
 						</el-form-item>
+						<el-form-item label="服务分类" v-if="goodsType == '服务'">
+							<div class="flex flex_wrap">
+								
+								<el-select v-model="form.contractOne" @change="selectOneb" placeholder="请选择" class="handle-select mr10">
+									<el-option v-for="(item,index) in form.contractOneList" :key="item.id" :label="item.name" :value="index">
+									</el-option>
+								</el-select>
+								<el-select v-model="form.contractTwo" @change="selectTwob" placeholder="请选择" class="handle-select mr10">
+									<el-option v-for="(item,index) in form.contractTwoList" :key="item.id" :label="item.name" :value="index">
+									</el-option>
+								</el-select>
+								<el-select v-model="form.contractThree" @change="selectThreeb" placeholder="请选择" class="handle-select mr10">
+									<el-option v-for="(item,index) in form.contractThreeList" :key="item.id" :label="item.name" :value="index">
+									</el-option>
+								</el-select>
+							</div>
+						</el-form-item>
 
 						<el-form-item label="商品单位">
-							<el-select v-model="form.waresCompany" placeholder="选择单位">
-								<el-option v-for="(item,index) in form.unitList" :key="item.name" :label="item.name" :value="item.name">
-								</el-option>
-							</el-select>
+							<el-input v-model="form.waresCompany" placeholder="请输入单位名称" class="big-input"></el-input>
 						</el-form-item>
 
 						<el-form-item label="商品排序">
@@ -45,9 +59,8 @@
 								<span> 输入1,2,3.....,.默认按从小到大排序</span>
 							</div>
 						</el-form-item>
-						<el-form-item label="品牌图片">
+						<el-form-item label="缩略图片">
 							<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:300*300像素，最多1张</div>
-							<!-- <img width="100%" :src="form.breviaryUrl" alt=""> -->
 							<el-upload 
 							:action="imgStr" 
 							:data="query" 
@@ -78,7 +91,7 @@
 								<img width="100%" v-for="item in form.bannerImg" :src="item" alt="">
 							</el-dialog>
 						</el-form-item>
-						<el-form-item label="价格范围">
+						<el-form-item label="价格">
 							<el-input v-model="form.waresPriceScope" placeholder="请输入价格范围" class="big-input"></el-input>
 						</el-form-item>
 						<el-form-item label="广告语">
@@ -156,6 +169,14 @@
 					classifyThree: '', //分类三
 					classifyThreeName: '',
 					
+					categoryId: 0,
+					contractOne: '',
+					contractOneList: [],
+					contractTwo: '',
+					contractTwoList: [],
+					contractThree: '',
+					contractThreeList: [],
+					
 					waresCompany:'',  //单位
 					unitList:select.unitList,  //单位列表
 					waresSort:'', //商品排序
@@ -185,13 +206,35 @@
 				dialogVisible: false,
 				dynamicTags: [],
 				inputVisible: false,
-				inputValue: ''
+				inputValue: '',
+				goodsType:'产品'
 			};
 		},
 		created(){
 			this.productCategory()
+			// this.productCategoryb();
 		},
 		methods: {
+			selectOneb(index){
+				//选择一级
+				this.form.categoryId = this.form.contractOneList[index].id;
+				this.form.contractOne = this.form.contractOneList[index].name;
+				this.form.contractTwoList = this.form.contractOneList[index].kidList;
+				// console.log(this.categoryId)
+			},
+			selectTwob(index){
+				//选择二级
+				this.form.categoryId = this.form.contractTwoList[index].id;
+				this.form.contractTwo = this.form.contractTwoList[index].name;
+				this.form.contractThreeList = this.form.contractTwoList[index].kidList;
+				// console.log(this.categoryId)
+			},
+			selectThreeb(index){
+				//选择三级
+				this.form.categoryId = this.form.contractThreeList[index].id;
+				this.form.contractThree = this.form.contractThreeList[index].name;
+				// console.log(this.categoryId)
+			},
 			// 获取产品分类
 			productCategory() {
 				var query = {
@@ -215,6 +258,7 @@
 				shopProductCategoryt(query).then(res => {
 					if (res.code == 1) {
 						this.form.classifyId = this.form.classifyOne[e].id;
+						this.form.classifyOneName = this.form.classifyOne[e].name;
 						this.form.classifyTwo = res.data
 					}else{
 						this.form.classifyTwo = ''; //分类二
@@ -234,6 +278,8 @@
 				shopProductCategoryt(query).then(res => {
 					if (res.code == 1) {
 						this.form.classifyId = this.form.classifyTwo[e].id;
+						this.form.classifyTwoName = this.form.classifyTwo[e].name;
+						
 						this.form.classifyThree = res.data
 					}else{
 						this.form.classifyThree = ''; //分类三
@@ -243,6 +289,7 @@
 			},
 			selectThree(e) {
 				this.form.classifyId = this.form.classifyThree[e].id;
+				this.form.classifyThreeName = this.form.classifyThree[e].name;
 			},
 			handleClose(tag) {
 				this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);

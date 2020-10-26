@@ -64,10 +64,7 @@
 						<el-input v-model="ruleForm.brand" placeholder="请输入品牌名称"></el-input>
 					</el-form-item>
 					<el-form-item label="产品单位">
-						<el-select v-model="ruleForm.unit" placeholder="选择产品单位">
-							<el-option v-for="(item,index) in ruleForm.unitList" :key="item.name" :label="item.name" :value="item.name">
-							</el-option>
-						</el-select>
+						<el-input v-model="ruleForm.unit" placeholder="输入产品单位"></el-input>
 					</el-form-item>
 					<el-form-item label="质保时长" class="big-input">
 						<el-input v-model="ruleForm.validityTerm" placeholder="请输入质保时长"></el-input>
@@ -145,7 +142,6 @@
 					classifyThreeName: '',
 					brand: '', //品牌名称
 					unit: '', //单位
-					unitList: select.unitList, //单位列表
 					validityTerm: '', //质保时长
 					placeOrigin: '', //产地
 					crowdSuits: '', //适合人群
@@ -324,7 +320,7 @@
 							}
 						}
 						//产品图片
-						this.productImg = res.data.brandLogo;
+						this.productUrl = res.data.brandLogo;
 						var urlStr = res.data.brandLogo.split(',');
 						urlStr.forEach(item => {
 							let obj = new Object();
@@ -333,7 +329,7 @@
 						});
 						//品牌图片
 						if (res.data.image) {
-							this.brandImg = res.data.image;
+							this.brandUrl = res.data.image;
 							var urlStr = res.data.image.split(',');
 							urlStr.forEach(item => {
 								let obj = new Object();

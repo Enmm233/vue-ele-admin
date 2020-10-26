@@ -7,6 +7,15 @@ export const fetchData = query => {
         params: query
     });
 };
+
+export const uploadLocation = query => {
+    return request({  //安卓测试 在顾客列表
+        url: '/api/friend/upload_location',
+        method: 'post',
+        params: query
+    });
+};
+
 export const doSendCode = query => {
     return request({  //获取验证码
         url: '/api/user/doSendCode',
@@ -320,5 +329,90 @@ export const getMerchandiseCategories = query => {
         params: query
     });
 };
+
+export const updShopService = query => {
+    return request({  //修改服务信息
+        url: '/api/merchant/upd_shopService',
+        method: 'post',
+        params: query
+    });
+};
+
+export const listShopReturnedPurchaseRefund = query => {
+    return request({  //退款退货申请列表
+        url: 'api/merchant/list_shopReturnedPurchaseRefund',
+        method: 'post',
+        params: query
+    });
+};
+
+export const addShopReturnedPurchaseDetailed = query => {
+    return request({  //增加退款列表
+        url: 'api/merchant/add_shopReturnedPurchaseDetailed',
+        method: 'post',
+        params: query
+    });
+};
+export const updShopReturnedPurchaseRefund = query => {
+    return request({  //修改退款退货申请
+        url: 'api/merchant/upd_shopReturnedPurchaseRefund',
+        method: 'post',
+        params: query
+    });
+};
+
+export const listShopReturnedPurchaseDetailed = query => {
+    return request({  //退款列表
+        url: 'api/merchant/list_shopReturnedPurchaseDetailed',
+        method: 'post',
+        params: query
+    });
+};
+export const listUserList = query => {
+    return request({  //顾客列表
+        url: '/api/merchant/list_userList',
+        method: 'post',
+        params: query
+    });
+};
+
+export const listWaresCommentByWaresId = query => {
+    return request({  //商品评论列表
+        url: '/api/merchant/listWaresCommentByWaresId',
+        method: 'post',
+        params: query
+    });
+};
+export const listStoreComment = query => {
+    return request({  //店铺评论
+        url: '/api/merchant/listStoreComment',
+        method: 'post',
+        params: query
+    });
+};
+export const selShopWarehousingByProductId = query => {
+    return request({  //根据产品编号获取产品入库记录详情
+        url: '/api/merchant/sel_shopWarehousingByProductId',
+        method: 'post',
+        params: query
+    });
+};
+
+export const addShopHousing = query => {
+    return request({  //增加商品入库记录
+        url: '/api/merchant/add_shopHousing',
+        method: 'post',
+        params: query
+    });
+};
+
+export const getWaresQrCode = query => {
+    return request({  //生成商品二维码(跳转)
+        url: '/api/merchant/get_wares_qr_code',
+        method: 'get',
+        params: query
+    });
+};
+
 
 

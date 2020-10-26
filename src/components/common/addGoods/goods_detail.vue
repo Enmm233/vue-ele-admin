@@ -33,7 +33,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="item flex">
+							<div class="item flex" v-if="waresLabel != ''">
 								<div class="left">标签文字：</div>
 								<div class="right">
 									<el-tag v-for="item in waresLabel">{{item}}</el-tag>
@@ -116,7 +116,6 @@
 								</div>
 							</div>
 							<div class="item flex">
-								<!-- <div class="rightt"> -->
 									<div style="width: 100%;">
 										<div class="conten spec">
 											<div class="spec_right">
@@ -142,11 +141,7 @@
 											</div>
 										</div>
 									</div>
-									
-
-								<!-- </div> -->
 							</div>
-	
 						</div>
 					</div>
 				</el-col>
@@ -267,6 +262,12 @@
 	    text-align: start;
 	    font-size: 15px;
 	    font-weight: 600;
+	}
+	#s-desc img {
+		width: 100%;
+	}
+	.goods_list .detail_box .con_body .describe p img{
+		 width: 100% !important;
 	}
 	
 </style>

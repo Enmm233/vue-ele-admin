@@ -53,9 +53,12 @@
 						<el-input v-model="ruleForm.brand" placeholder="请输入品牌名称"></el-input>
 					</el-form-item>
 					<el-form-item label="产品单位">
-						<el-select v-model="ruleForm.unit" placeholder="选择产品单位">
-							<el-option v-for="(item,index) in ruleForm.unitList" :key="item.name" :label="item.name" :value="item.name">
-							</el-option>
+						<!-- <el-select v-model="ruleForm.unit" placeholder="选择产品单位"> -->
+							
+							<el-input v-model="ruleForm.unit" placeholder="请输入产品单位"></el-input>
+							
+							<!-- <el-option v-for="(item,index) in ruleForm.unitList" :key="item.name" :label="item.name" :value="item.name">
+							</el-option> -->
 						</el-select>
 					</el-form-item>
 					<el-form-item label="质保时长" class="big-input">
@@ -183,7 +186,15 @@
 					return;
 				}
 				if(form.classifyOneName == ''){
-					this.$message.error('产品大类不能为空');
+					this.$message.error('产品一类不能为空');
+					return;
+				}
+				if(form.classifyTwoName == ''){
+					this.$message.error('产品二类不能为空');
+					return;
+				}
+				if(form.classifyThreeName == ''){
+					this.$message.error('产品三类不能为空');
 					return;
 				}
 				if(form.productUrl == ''){
@@ -321,9 +332,9 @@
 					}
 				};
 				shopProductCategoryt(query).then(res => {
+					this.ruleForm.classifyId = this.ruleForm.classifyOne[e].id;
+					this.ruleForm.classifyOneName = this.ruleForm.classifyOne[e].name;
 					if (res.code == 1) {
-						this.ruleForm.classifyId = this.ruleForm.classifyOne[e].id;
-						this.ruleForm.classifyOneName = this.ruleForm.classifyOne[e].name;
 						this.ruleForm.classifyTwo = res.data
 					}
 				});
@@ -335,14 +346,16 @@
 					}
 				};
 				shopProductCategoryt(query).then(res => {
+					this.ruleForm.classifyId = this.ruleForm.classifyTwo[e].id;
+					this.ruleForm.classifyTwoName = this.ruleForm.classifyTwo[e].name;
 					if (res.code == 1) {
-						this.ruleForm.classifyId = this.ruleForm.classifyTwo[e].id;
 						this.ruleForm.classifyThree = res.data
 					}
 				});
 			},
 			selectThree(e) {
 				this.ruleForm.classifyId = this.ruleForm.classifyThree[e].id;
+				this.ruleForm.classifyThreeName = this.ruleForm.classifyThree[e].name;
 			},
 
 

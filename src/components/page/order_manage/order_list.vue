@@ -41,6 +41,10 @@
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
 				</div>
 			</div>
+			
+			<div class="handle-box">
+			    <el-button type="success" @click="refreshData">刷新列表</el-button>
+			</div>
 
 			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header">
 				<el-table-column type="selection" width="55" align="center"></el-table-column>
@@ -73,7 +77,7 @@
 				<el-table-column label="操作" align="center">
 					<template slot-scope="scope">
 						<el-button type="primary" size="mini" @click="handleDetails(scope.$index, scope.row)">详情</el-button>
-						<el-button type="success" size="mini" @click="handleShipments(scope.$index, scope.row)">发货</el-button>
+						<el-button v-if="scope.row.status == 2" type="success" size="mini" @click="handleShipments(scope.$index, scope.row)">发货</el-button>
 						<!-- <el-button type="danger" size="mini" @click="handleEdit(scope.$index, scope.row)">备货</el-button> -->
 					</template>
 				</el-table-column>
@@ -199,6 +203,18 @@
 			this.getData();
 		},
 		methods: {
+			refreshData(){
+			   //刷新列表
+			   this.form.orderId = '';
+			   this.form.orderStatus = 0;
+			   this.form.orderStatusStr = '';
+			   this.form.waresName = '';
+			   this.form.address = '';
+			   this.value1 = [];
+			   this.page = 1;
+			   this.pageTotal = 0;
+			   this.getData();
+			  },
 			deliver(){
 				if(this.shipmentsInfo.logisticsCompany == ''){
 					this.$message.error('物流公司名称不能为空');
@@ -299,15 +315,23 @@
 						address: this.form.address,
 						startTime: startTime,
 						endTime: endTime,
-
 						nowPage: this.page,
 						pageCount: 9,
 					}
 				};
 				listWaresOrder(query).then(res => {
 					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},

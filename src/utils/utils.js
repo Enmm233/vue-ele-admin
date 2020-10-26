@@ -35,6 +35,13 @@ export function getNowFormatDate() {
             + seperator2 + date.getSeconds();
     return currentdate;
 }
+
+
+export function formatterDate(date) {
+    let result = new Date(date);
+    return result;
+}
+
 /* *
  * 压缩
   */

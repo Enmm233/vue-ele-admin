@@ -3,9 +3,13 @@
 		<div class="goods_a">
 			<div class="item">
 				<div class="flex flex_item_mid">
-					<div class="title">
+					<div class="title" v-if="goodsType == '产品'">
 						<div class="xian"></div>
 						可选产品
+					</div>
+					<div class="title" v-if="goodsType == '服务'">
+						<div class="xian"></div>
+						可选服务
 					</div>
 					<div class="tit_select flex">
 						<el-select v-model="goodsType" @change="selectType" placeholder="默认" class="handle-select mr10">
@@ -27,16 +31,40 @@
 								</el-option>
 							</el-select>
 						</div>
+
+						<div class="flex flex_wrap" v-if="goodsType == '服务'">
+							<el-select v-model="contractOne" @change="selectOneb" placeholder="请选择" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractOneList" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
+							<el-select v-model="contractTwo" @change="selectTwob" placeholder="请选择" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractTwoList" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
+							<el-select v-model="contractThree" @change="selectThreeb" placeholder="请选择" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractThreeList" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
+						</div>
 					</div>
 				</div>
 
-				<el-table ref="multipleTable" :data="goodsAList.data" border tooltip-effect="dark" style="width: 100%" height="411"
+				<el-table v-if="goodsType == '产品'" ref="multipleTable" :data="goodsAList.data" border tooltip-effect="dark" style="width: 100%" height="411"
 				 row-key="date" @selection-change="handleSelectionChange1">
 					<el-table-column type="selection" width="55">
 					</el-table-column>
 					<el-table-column prop="id" label="产品ID" width="180">
 					</el-table-column>
 					<el-table-column prop="name" label="产品名称" width="250">
+					</el-table-column>
+				</el-table>
+				<el-table v-if="goodsType == '服务'" ref="multipleTable" :data="goodsAList.data" border tooltip-effect="dark" style="width: 100%" height="411"
+				 row-key="date" @selection-change="handleSelectionChange1">
+					<el-table-column type="selection" width="55">
+					</el-table-column>
+					<el-table-column prop="id" label="服务ID" width="180">
+					</el-table-column>
+					<el-table-column prop="name" label="服务名称" width="250">
 					</el-table-column>
 				</el-table>
 				<div class="pagination">
@@ -55,17 +83,31 @@
 				</el-button-group>
 			</div>
 			<div class="item">
-				<div class="title">
+				<div class="title" v-if="goodsType == '产品'">
 					<div class="xian"></div>
 					已选产品
 				</div>
-				<el-table ref="multipleTable" :data="goodsAData" border tooltip-effect="dark" style="width: 100%" height="411"
+				<div class="title" v-if="goodsType == '服务'">
+					<div class="xian"></div>
+					已选服务
+				</div>
+				<el-table v-if="goodsType == '产品'" ref="multipleTable" :data="goodsAData" border tooltip-effect="dark" style="width: 100%" height="411"
 				 row-key="date" @selection-change="handleSelectionChange2">
 					<el-table-column type="selection" width="55">
 					</el-table-column>
+		
 					<el-table-column prop="id" label="产品ID" width="180">
 					</el-table-column>
 					<el-table-column prop="name" label="产品名称" width="250">
+					</el-table-column>
+				</el-table>
+				<el-table v-if="goodsType == '服务'" ref="multipleTable" :data="goodsAData" border tooltip-effect="dark" style="width: 100%" height="411"
+				 row-key="date" @selection-change="handleSelectionChange2">
+					<el-table-column type="selection" width="55">
+					</el-table-column>
+					<el-table-column prop="id" label="服务ID" width="180">
+					</el-table-column>
+					<el-table-column prop="name" label="服务名称" width="250">
 					</el-table-column>
 				</el-table>
 			</div>
@@ -77,14 +119,18 @@
 	import {
 		shopProductCategoryt,
 		getShopProductList,
+		getMerchandiseCategories,
+		listShopService
 	} from '../../../api/index';
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		name: 'shuttle',
 		props: ['num'],
-		computed:{
-		   ...mapState(['accountId']),  //显示state的数据
-		  },
+		computed: {
+			...mapState(['accountId']), //显示state的数据
+		},
 		data() {
 			return {
 				goodsType: "产品",
@@ -95,6 +141,15 @@
 				classifyTwoName: '',
 				classifyThree: '', //分类三
 				classifyThreeName: '',
+
+				categoryId: 0,
+				contractOne: '',
+				contractOneList: [],
+				contractTwo: '',
+				contractTwoList: [],
+				contractThree: '',
+				contractThreeList: [],
+
 				page: 1,
 				pageTotal: 0,
 
@@ -113,9 +168,78 @@
 		},
 		methods: {
 			selectType(e) {
+				this.goodsAData = [];
+				this.goodsAList = [];
+				this.page = 1;
+				this.pageTotal = 0;
 				if (e == "产品") {
 					this.getData()
 				}
+				if (e == "服务") {
+					this.getDatab();
+					this.productCategoryb();
+				}
+			},
+			getDatab() {
+				var query = {
+					data: {
+						accountId: this.accountId,
+						serviceName: '',
+						categoryId: this.categoryId,
+						brandName: '',
+						address: '',
+						nowPage: this.page,
+						pageCount: 9,
+					}
+				};
+				listShopService(query).then(res => {
+					if (res.code == 1) {
+						// this.$message.success('加载成功');
+						this.goodsAList = res;
+						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.goodsAList = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.goodsAList = [];
+							this.pageTotal = 0;
+						}
+					}
+				});
+			},
+			// 获取产品分类
+			productCategoryb() {
+				var query = {
+					data: {
+						waresType: 2
+					}
+				};
+				getMerchandiseCategories(query).then(res => {
+					if (res.code == 1) {
+						this.contractOneList = res.data
+					}
+				});
+			},
+			selectOneb(index){
+				//选择一级
+				this.categoryId = this.contractOneList[index].id;
+				this.contractTwoList = this.contractOneList[index].kidList;
+				this.getDatab()
+				// console.log(this.categoryId)
+			},
+			selectTwob(index){
+				//选择二级
+				this.categoryId = this.contractTwoList[index].id;
+				this.contractThreeList = this.contractTwoList[index].kidList;
+				this.getDatab()
+				// console.log(this.categoryId)
+			},
+			selectThreeb(index){
+				//选择三级
+				this.categoryId = this.contractThreeList[index].id;
+				this.getDatab()
+				// console.log(this.categoryId)
 			},
 			// 获取 easy-mock 的模拟数据
 			getData() {
@@ -165,7 +289,7 @@
 						this.classifyId = this.classifyOne[e].id;
 						this.classifyTwo = res.data;
 						this.getData()
-					}else{
+					} else {
 						this.classifyTwo = ''; //分类二
 						this.classifyTwoName = '';
 						this.classifyThree = ''; //分类三
@@ -185,7 +309,7 @@
 						this.classifyId = this.classifyTwo[e].id;
 						this.classifyThree = res.data;
 						this.getData()
-					}else{
+					} else {
 						this.classifyThree = ''; //分类三
 						this.classifyThreeName = '';
 					}

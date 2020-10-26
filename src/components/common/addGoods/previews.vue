@@ -13,6 +13,7 @@
 					<div class="block" v-else>
 						<el-image 
 						style="width: 150px; height: 100px;border: 1px solid #eee;" 
+						:src="imgUrl+info.breviaryUrl"
 						 fit="contain"></el-image>
 					</div>
 				</div>
@@ -30,9 +31,10 @@
 						</div>
 					</div>
 				</div>
-				<div class="num flex flex_item_between" v-if="infoItem">
-					<span>库存数：{{infoItem.stocstockNumber}}{{infoItem.waresCompany}}</span>
-					<span>¥{{infoItem.price}}</span>
+				<div class="num flex flex_item_between">
+					<span v-if="infoItem">库存数：{{infoItem.stockNumber}}{{infoItem.waresCompany}}</span>
+					<span v-if="!infoItem && info.waresPriceScope != ''">¥{{info.waresPriceScope}}</span>
+					<span v-if="infoItem">¥{{infoItem.price}}</span>
 				</div>
 			</div>
 		</div>
@@ -70,6 +72,7 @@
 			};
 		},
 		created() {
+			console.log(this.info)
 		},
 		methods: {
 			clickLi(data,infoItem) {
@@ -81,7 +84,7 @@
 				})
 				narA.push(data.sub[0])
 				this.infoItem = infoItem;
-				// console.log(infoItem)
+				console.log(this.infoItem)
 			},
 		}
 	}

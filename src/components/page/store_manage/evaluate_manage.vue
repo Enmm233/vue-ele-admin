@@ -2,29 +2,31 @@
 <!-- comment_list 评论列表 -->
 <template>
 	<div>
+		
 		<div class="container">
+			<div class="handle-box">
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
+			</div>
 			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
 			 @selection-change="handleSelectionChange">
-				<el-table-column prop="waresId" label="商品ID" width="100" align="center"></el-table-column>
-				<el-table-column prop="waresName" label="商品名称" width="300"></el-table-column>
-				<el-table-column prop="serviceName" label="商品规格" align="center" width="200"></el-table-column>
 				<el-table-column prop="userId" label="用户ID" align="center" width="200"></el-table-column>
-				<el-table-column prop="id" label="用户昵称" align="center" width="200"></el-table-column>
-				<el-table-column prop="createTime" label="创建时间" align="center" width="150"></el-table-column>
-				<el-table-column label="商品图片" align="center">
+				<el-table-column prop="nickname" label="用户昵称" align="center" width="200"></el-table-column>
+				<el-table-column prop="commentTime" label="评论时间" align="center" width="150"></el-table-column>
+				<el-table-column label="评论图片" align="center">
 					<template slot-scope="scope">
 						<!-- <el-image class="table-td-thumb" :src="imgUrl+scope.row.image" :preview-src-list="[scope.row.thumb]"></el-image> -->
-						<el-image class="table-td-thumb" :src="imgUrl+scope.row.image"></el-image>
+						<el-image class="table-td-thumb" :src="imgUrl+scope.row.images"></el-image>
 					</template>
 				</el-table-column>
 				<el-table-column prop="starRating" label="评分" align="center" width="100"></el-table-column>
-				<el-table-column prop="content" label="评论内容" align="center" width="150"></el-table-column>
-				<el-table-column label="操作" align="center">
+				<el-table-column prop="content" label="评论内容" align="center"></el-table-column>
+				<!-- <el-table-column label="操作" align="center" width="150">
 					<template slot-scope="scope">
 						<el-button type="danger" size="mini" @click="handleEdit(scope.$index, scope.row)">回复</el-button>
 					</template>
-				</el-table-column>
+				</el-table-column> -->
 			</el-table>
+			
 			<div class="pagination">
 				<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10"
 				 @current-change="handlePageChange"></el-pagination>
@@ -61,8 +63,8 @@
 
 <script>
 	import {
-		listShopWaresComment,
-		insertShopWaresCommenreply
+		insertShopWaresCommenreply,
+		listStoreComment
 	} from '../../../api/index';
 	import { mapState } from 'vuex'
 	import { dateFormat } from '../../../utils/utils.js'
@@ -89,8 +91,18 @@
 			this.getData();
 		},
 		methods: {
+			refreshData(){
+			   //刷新列表
+			   this.page = 1;
+			   this.pageTotal = 0;
+			   this.getData();
+			  },
 			//回复评论
 			saveEdit(){
+				if(this.replyTxt == ""){
+					this.$message.error('请输入回复内容');
+					return
+				}
 				var query = {
 					data: {
 						commentId: this.content.id,
@@ -101,12 +113,10 @@
 					}
 				};
 				insertShopWaresCommenreply(query).then(res => {
-					// console.log(res)
 					if (res.code == 1) {
 						this.$message.success('回复成功');
 						this.dialogVisible = false;
 						this.replyTxt = '';
-						// this.tableData.data.splice(index, 1);
 						this.getData();
 					}
 				});
@@ -124,21 +134,23 @@
 				var query = {
 					data: {
 						accountId: this.accountId,
-						waresName: '',
-						productName:'',
-						starRating:0,
-						reply:'',
-						startTime:'',
-						endTime:'',
-						
 						nowPage: this.page,
 						pageCount: 6,
 					}
 				};
-				listShopWaresComment(query).then(res => {
+				listStoreComment(query).then(res => {
 					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},

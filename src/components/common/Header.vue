@@ -53,21 +53,23 @@
 		signOut
 	} from '../../api/index.js';
 import bus from '../common/bus';
+import { mapState } from 'vuex'
 export default {
     data() {
         return {
             collapse: false,
             fullscreen: false,
-            name: 'linxin',
+            name: '默认昵称',
             message: 2
         };
     },
-    computed: {
-        username() {
-            let username = localStorage.getItem('ms_username');
-            return username ? username : this.name;
-        }
-    },
+	computed:{
+		...mapState(['msUsername','accountId']),  //显示state的数据
+		username() {
+		    let username = this.msUsername;
+		    return username ? username : localStorage.getItem('login_id');
+		}
+	},
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
@@ -124,7 +126,6 @@ export default {
         }
     },
     mounted() {
-		// console.log(localStorage.getItem('ms_username'))
         if (document.body.clientWidth < 1500) {
             this.collapseChage();
         }

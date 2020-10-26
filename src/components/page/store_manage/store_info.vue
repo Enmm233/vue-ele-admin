@@ -210,11 +210,9 @@
 			</el-col>
 		</el-row>
 		
-		
-		<el-dialog :close-on-click-modal="false" title="添加产品" :visible.sync="isShow" width="80%">
+		<el-dialog :close-on-click-modal="false" title="修改店铺基础信息" :visible.sync="isShow" width="80%">
 			<add-store @addaucceed="getData" @cancel="cancel"></add-store>
 		</el-dialog>
-
 		
 	</div>
 </template>

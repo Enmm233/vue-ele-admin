@@ -5,6 +5,10 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
 	state:{
+		// URL: 'http://192.168.0.116:8080',  //接口地址
+		 URL: 'http://192.168.0.222:8080',  //接口地址
+		 // URL: ' http://127.0.0.1:8080/zhc_war',  //接口地址
+		 // URL: 'http://101.37.204.197/zhc_war',  //接口地址
 		imgUrl:'http://192.168.0.222:8080/img/', //图片地址
 		// imgUrl:' http://127.0.0.1:8080/zhc_war/img/', //图片地址
 		// imgUrl:'http://101.37.204.197/zhc_war/img/', //图片地址
@@ -15,8 +19,8 @@ export default new Vuex.Store({
 		count:0,
 		// accountId:localStorage.getItem('account_id'),
 		accountId: "1596621041",
-		// msUsername:localStorage.getItem('ms_username'),
-		msUsername: '呵呵',
+		msUsername:localStorage.getItem('ms_username'),
+		// msUsername: '呵呵',
 		
 		list:[]
 	},

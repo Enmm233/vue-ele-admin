@@ -51,6 +51,7 @@
 			</div>
 			<div class="handle-box">
 				<el-button type="primary" @click="handleAdd">添加</el-button>
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
 				<!-- <el-button type="info">删除</el-button> -->
 			</div>
 			<el-table height="555" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
@@ -93,13 +94,7 @@
 				</el-table-column>
 				<el-table-column label="赠品单位" width="100">
 					<template slot-scope="scope">
-						<span v-if="scope.row.giftCompany == 1">个</span>
-						<span v-if="scope.row.giftCompany == 2">项</span>
-						<span v-if="scope.row.giftCompany == 3">米</span>
-						<span v-if="scope.row.giftCompany == 4">公里</span>
-						<span v-if="scope.row.giftCompany == 5">斤</span>
-						<span v-if="scope.row.giftCompany == 6">箱</span>
-						<span v-if="scope.row.giftCompany == 7">套</span>
+						<span>{{scope.row.giftCompany}}</span>
 					</template>
 				</el-table-column>
 				<el-table-column prop="giftNum" label="赠品数量" align="center" width="100"></el-table-column>
@@ -161,14 +156,15 @@
 						</el-form-item>
 						<el-form-item label="赠品单位">
 							<div>
-								<el-select v-model="giftItem.giftCompanyStr" placeholder="默认" @change="editGiftCompanyCil" class="handle-select mr10">
+								<el-input v-model="giftItem.giftCompany" placeholder="输入赠品单位"></el-input>
+							<!-- 	<el-select v-model="giftItem.giftCompanyStr" placeholder="默认" @change="editGiftCompanyCil" class="handle-select mr10">
 									<el-option
 									  v-for="(item,index) in giftItem.giftCompanyList"
 									  :key="item.type"
 									  :label="item.val"
 									  :value="index">
 									</el-option>
-								</el-select>
+								</el-select> -->
 							</div>
 						</el-form-item>
 						<el-form-item label="赠品数量">
@@ -272,8 +268,8 @@
 					giftSourceStr:'',   
 					giftSourceList:select.giftSourceList,
 					
-					giftCompany:0,   //单位
-					giftCompanyStr:'',   
+					giftCompany:'',   //单位
+					// giftCompanyStr:'',   
 					giftCompanyList:select.giftCompanyList,
 					giftPrice:'',  //赠品单价
 					giftNum:'',  //赠品数量
@@ -296,6 +292,20 @@
 			this.getData();
 		},
 		methods: {
+			refreshData(){
+			   //刷新列表
+			   this.giftName = '';
+			   this.giftType = 0;
+			   this.giftTypeStr = '';
+			   this.giftSort = 0;
+			   this.giftSortStr = '';
+			   this.giftSource = 0;
+			   this.giftSourceStr = '';
+			   this.giftNum = '';
+			   this.page = 1;
+			   this.pageTotal = 0;
+			   this.getData();
+			  },
 			handleClickItem() {
 				// 获取遮罩层dom
 				var domImageMask = '';
@@ -341,8 +351,8 @@
 					this.$message.error('请选择赠品来源');
 					return
 				}
-				if(item.giftCompany == 0){
-					this.$message.error('请选择赠品单位');
+				if(item.giftCompany == ''){
+					this.$message.error('请输入赠品单位');
 					return
 				}
 				if(item.giftNum == 0){
@@ -376,7 +386,6 @@
 				addShopGift(query).then(res => {
 					if(res.code == 1){
 						this.dialogVisible = false;
-						this.$refs['my-upload'].clearFiles();
 						this.productUrl = '';
 						this.productImg = '';
 						this.giftImgList = [];
@@ -492,8 +501,8 @@
 					giftSourceStr:'',   
 					giftSourceList:select.giftSourceList,
 					
-					giftCompany:0,   //单位
-					giftCompanyStr:'',   
+					giftCompany:'',   //单位
+					// giftCompanyStr:'',   
 					giftCompanyList:select.giftCompanyList,
 					giftPrice:'',  //赠品单价
 					giftNum:'',  //赠品数量
@@ -535,7 +544,7 @@
 							giftSourceList:select.giftSourceList,
 							
 							giftCompany:res.data.giftCompany,   //单位
-							giftCompanyStr:select.giftCompanyList[res.data.giftCompany-1].val,   
+							// giftCompanyStr:select.giftCompanyList[res.data.giftCompany-1].val,   
 							giftCompanyList:select.giftCompanyList,
 							
 							giftPrice:res.data.giftPrice,  //赠品单价
@@ -611,9 +620,18 @@
 					}
 				};
 				listShopGift(query).then(res => {
-					if(res.code == 1){
+					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -647,7 +665,7 @@
 						delShopGift(query).then(res => {
 							if(res.code == 1){
 								this.$message.success('删除成功');
-								// this.tableData.data.splice(index, 1);
+								this.tableData.data.splice(index, 1);
 								this.getData();
 							}
 						});
@@ -664,7 +682,7 @@
 	}
 
 	.handle-select {
-		width: 120px;
+		width: 120px !important;
 	}
 
 	.handle-input {

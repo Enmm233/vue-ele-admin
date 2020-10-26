@@ -32,7 +32,7 @@
 			<div class="evaluate_reply">
 				<div>
 					<p class="title">用户评论内容：</p>
-					<p class="txt">超喜欢这种少骨鲤鱼了，鲜嫩无比，煲的鱼汤乳白浓稠鲜美无比下次我们介绍更多的朋友来买。好东西要多宣传。</p>
+					<p class="txt">{{content.content}}</p>
 				</div>
 				<div>
 					<p class="title">回复用户内容：</p>
@@ -41,7 +41,7 @@
 						  type="textarea"
 						  :autosize="{ minRows: 4, maxRows: 10}"
 						  placeholder="请输入内容"
-						  v-model="textarea1">
+						  v-model="replyTxt">
 						</el-input>
 					</div>
 				</div>
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-	import { listShopWaresComment } from '../../../api/index.js';
+	import { listWaresCommentByWaresId,insertShopWaresCommenreply } from '../../../api/index.js';
 	import { mapState } from 'vuex'
 	export default {
 		name: 'evaluateList',
@@ -67,14 +67,9 @@
 		    },
 		data() {
 			return {
+				content:'',
 				page: 1,
 				pageTotal: 0,
-				query: {
-					address: '',
-					name: '',
-					pageIndex: 1,
-					pageSize: 10
-				},
 				tableData: [],
 				multipleSelection: [],
 				delList: [],
@@ -83,32 +78,59 @@
 				form: {},
 				idx: -1,
 				id: -1,
-				textarea1:''
+				replyTxt:''
 			}
 		},
 		created() {
-			this.getData();
+			this.getData(this.id);
 		},
 		methods: {
-			getData() {
+			//回复评论
+			saveEdit(){
+				if(this.replyTxt == ""){
+					this.$message.error('请输入回复内容');
+					return
+				}
 				var query = {
 					data: {
-						// accountId:localStorage.getItem('account_id'),
-						accountId: this.accountId,
-						waresName: '',
-						productName: '',
-						startTime: '',
-						endTime: '',
-						starRating: 0,
-						reply: 0,
+						commentId: this.content.id,
+						commentUserId: this.content.userId,
+						commentReplyUserId: this.accountId,
+						replyContent: this.replyTxt,
+						replyImg: '',
+					}
+				};
+				insertShopWaresCommenreply(query).then(res => {
+					// console.log(res)
+					if (res.code == 1) {
+						this.$message.success('回复成功');
+						this.innerVisible = false;
+						this.replyTxt = '';
+						this.getData(this.id);
+					}
+				});
+			},
+			getData(id) {
+				var query = {
+					data: {
+						waresId: id,
 						nowPage: this.page,
 						pageCount: 6,
 					}
 				};
-				listShopWaresComment(query).then(res => {
+				listWaresCommentByWaresId(query).then(res => {
 					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -117,18 +139,17 @@
 				this.page = val;
 				this.getData();
 			},
-			// 编辑操作
+			// 编辑操作(回复)
 			handleEdit(index, row) {
-				this.idx = index;
-				this.form = row;
+				this.content = row;
 				this.innerVisible = true;
 			},
 			// 保存编辑
-			saveEdit() {
-				this.innerVisible = false;
-				this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-				this.$set(this.tableData, this.idx, this.form);
-			},
+			// saveEdit() {
+			// 	this.innerVisible = false;
+			// 	this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+			// 	this.$set(this.tableData, this.idx, this.form);
+			// },
 		},
 
 	};

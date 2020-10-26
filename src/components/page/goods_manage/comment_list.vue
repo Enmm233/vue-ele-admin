@@ -47,6 +47,9 @@
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
 				</div>
 			</div>
+			<div class="handle-box">
+			    <el-button type="success" @click="refreshData">刷新列表</el-button>
+			</div>
 			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
 			 @selection-change="handleSelectionChange">
 				<el-table-column prop="waresId" label="商品ID" width="100" align="center"></el-table-column>
@@ -149,6 +152,21 @@
 			this.getData();
 		},
 		methods: {
+			refreshData(){
+			   //刷新列表
+			   this.form.waresName = '';
+			   this.form.productName = '';
+			   this.form.starRating = 0;
+			   this.form.starRatingStr = '';
+			   this.form.reply = 0;
+			   this.form.replyStr = '';
+			   this.form.startTime = '';
+			   this.form.endTime = '';
+			   this.value1 = [];
+			   this.page = 1;
+			   this.pageTotal = 0;
+			   this.getData();
+			},
 			//回复评论
 			saveEdit(){
 				var query = {
@@ -209,8 +227,17 @@
 				};
 				listShopWaresComment(query).then(res => {
 					if (res.code == 1) {
+						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
+					}else if(res.code == 2){
+						if(res.data.length > 0){
+							this.tableData = res;
+							this.pageTotal = res.allPage;
+						}else{
+							this.tableData = [];
+							this.pageTotal = 0;
+						}
 					}
 				});
 			},
@@ -243,7 +270,7 @@
 	}
 
 	.handle-select {
-		width: 120px;
+		width: 120px !important;
 	}
 
 	.handle-input {

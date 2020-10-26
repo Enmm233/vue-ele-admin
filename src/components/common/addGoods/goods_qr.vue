@@ -25,38 +25,37 @@
 				</div>
 			</el-col>
 			<el-col :span="12">
-				<div class="form">
-					<el-form ref="form" label-width="120px">
-						<el-form-item label="商品名称">
-							<span>{{goodsInfo.waresName}}</span>
-						</el-form-item>
-						<el-form-item label="选中规格">
-							<el-input v-if="selectArr == ''" :disabled="true" placeholder="请选择规格" class="pick-input mr10"></el-input>
-							<span v-else class="flex">
-								<span v-for="item in selectArr" class="flex">
-									{{item.name}},
-									<span v-if="item.children != ''" class="flex">
-										<span v-for="dd in item.children">
-											{{dd.name}},
-										</span>
+				<div class="image_box">
+					<div class="title">
+						<div style="color: #7B7979; font-size: 14px;">
+							<i class="el-icon-lx-info"></i>
+							<span>
+								商品ID|商品名称|选择规格|入库批次ID
+							</span>
+						</div>
+					</div>
+					<div class="img">
+						 <el-image
+						      style="width: 220px; height: 220px"
+						      :src="qrUrl"
+						      fit="fill"></el-image>
+					</div>
+					<div style="color: #7B7979; font-size: 14px;">
+						<span>
+							{{goodsInfo.id}} |{{goodsInfo.waresName}} |
+							<span v-for="item in selectArr">
+								{{item.name}},
+								<span v-if="item.children != ''">
+									<span v-for="dd in item.children">
+										{{dd.name}},
 									</span>
 								</span>
 							</span>
-						</el-form-item>
-						<el-form-item label="商品批次">
-							<el-input v-if="arrTitle == ''" :disabled="true" placeholder="商品批次为空" class="pick-input mr10"></el-input>
-							<span v-else class="flex">
-								<span v-for="item in arrTitle" class="flex">
-									{{item}},
-								</span>
-							</span>
-						</el-form-item>
-						<el-form-item label="入库数量">
-							<div class="flex">
-								<el-input type="number" v-model="inventory" placeholder="按单位输入数量" class="pick-input mr10"></el-input>
-							</div>
-						</el-form-item>
-					</el-form>
+						 |<span v-for="item in arrTitle">
+							{{item}},
+						</span>
+						</span>
+					</div>
 				</div>
 			</el-col>
 		</el-row>
@@ -64,11 +63,11 @@
 </template>
 
 <script>
-	import warehousSpec from './warehous_spec.vue'
 	import {
 		getShopWares,
 		selShopWarehousingByProductId,
-		addShopHousing
+		addShopHousing,
+		getWaresQrCode
 	} from '../../../api/index';
 	import {
 		mapState
@@ -76,12 +75,9 @@
 	export default {
 		name: 'info',
 		computed: {
-			...mapState(['imgUrl', 'accountId']), //显示state的数据
+			...mapState(['URL','imgUrl', 'accountId']), //显示state的数据
 		},
 		props: ['id'],
-		components: {
-			warehousSpec
-		},
 		data() {
 			return {
 				selectArr: [], //存放被选中的值
@@ -92,7 +88,8 @@
 				defaultProps: {
 					children: 'children',
 					label: 'name'
-				}
+				},
+				qrUrl:'',
 			};
 		},
 		created() {
@@ -101,6 +98,7 @@
 		methods: {
 			handleCheckChange() {
 				this.selectArr = this.$refs.tree.getCheckedNodes(true,true);
+				this.WaresQrCode()
 				// console.log(this.selectArr)
 			},
 			getData(id) {
@@ -136,6 +134,7 @@
 						for(let index in this.goodsInfo.shopProducts){
 							this.ShopWarehousingByProductId(this.goodsInfo.shopProducts[index].id)
 						}
+						this.WaresQrCode()
 					}
 				});
 			},
@@ -149,8 +148,34 @@
 				selShopWarehousingByProductId(query).then(res => {
 					if (res.code == 1) {
 						this.arrTitle.push(res.data.warehousingBatch)
+						this.WaresQrCode()
 					}
 				});
+			},
+			WaresQrCode() {
+				
+				if(this.selectArr != ''){
+					var spec = this.selectArr;  //规格
+					var arr = [];
+					for (let index in spec) {
+						arr.push(spec[index].name)
+					}
+				}else{
+					var arr = [];
+				}
+				var idBatch = this.arrTitle.toString();
+				var data = {
+					id:this.goodsInfo.id,
+					name:this.goodsInfo.waresName,
+					spec:arr.toString(),
+					warehousingBatch:idBatch,
+				}
+				var str = '商品ID:'+data.id+'商品名称:'+data.name+'规格:'+data.spec+'批次ID:'+data.warehousingBatch;
+				var qrCode = {
+					qrCode:str
+				}
+				this.qrUrl = this.URL+'/api/merchant/get_wares_qr_code?data='+JSON.stringify(qrCode);
+				console.log(this.qrUrl)
 			},
 		}
 	}
@@ -184,5 +209,9 @@
 	}
 	.el-tree-node__content {
 	    height: 30px !important;
+	}
+	.image_box{
+		text-align: center;
+		padding-top: 50px;
 	}
 </style>
