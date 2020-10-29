@@ -201,7 +201,7 @@
 				}
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						orderId: orderId,
 						applyId: applyId,
 						refundStatus: this.refundStatus,

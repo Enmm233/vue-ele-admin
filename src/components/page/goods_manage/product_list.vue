@@ -5,7 +5,7 @@
 			<div class="flex flex_item_between">
 				<el-form class="flex flex_wrap" label-width="80px">
 					<el-form-item label="产品名称">
-						<el-input v-model="productName" class="handle-input mr10"></el-input>
+						<el-input v-model="productName" placeholder="请输入名称/ID" class="handle-input mr10"></el-input>
 					</el-form-item>
 					<el-form-item label="产品分类">
 						<div class="flex flex_wrap">
@@ -55,13 +55,12 @@
 					<template slot-scope="scope">{{scope.row.categoryName}}</template>
 				</el-table-column>
 				<el-table-column label="产品图片" width="120" align="center">
-					<template slot-scope="scope">			
-						<el-image 
-						class="table-td-thumb" 
-						:src="imgUrl+scope.row.image" 
-						@click.stop="handleClickItem" 
-						:preview-src-list="[imgUrl+scope.row.image]"></el-image>
+					<template slot-scope="scope">
+						<el-image class="table-td-thumb" :src="imgUrl+scope.row.image" @click.stop="handleClickItem" :preview-src-list="[imgUrl+scope.row.image]"></el-image>
 					</template>
+				</el-table-column>
+				<el-table-column label="库存" width="120" align="center">
+					<template slot-scope="scope">{{scope.row.warehousingNum}}</template>
 				</el-table-column>
 				<el-table-column label="品牌名称" width="120" align="center">
 					<template slot-scope="scope">{{scope.row.brand}}</template>
@@ -74,7 +73,7 @@
 				</el-table-column>
 				<el-table-column label="操作" align="center">
 					<template slot-scope="scope">
-						<el-button v-if="scope.row.flag == 0" type="primary" size="mini" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button>
+						<el-button type="primary" size="mini" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button>
 						<el-button type="success" size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 						<el-button type="danger" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
 					</template>
@@ -131,9 +130,9 @@
 	import editProduct from '../../common/addGoods/edit_product.vue'
 	export default {
 		name: 'basetable',
-		computed:{
-		     ...mapState(['accountId','imgUrl','msUsername']),  //显示state的数据
-		    },
+		computed: {
+			...mapState(['accountId', 'imgUrl', 'msUsername']), //显示state的数据
+		},
 		components: {
 			addProduct,
 			editProduct
@@ -144,17 +143,17 @@
 				brand: '', //品牌
 				origin: '', //产地
 				classifyId: 0, //分类ID
-				classifyOne: '', //分类一
+				classifyOne: [{"id": 0,"name": "全部"}], //分类一
 				classifyOneName: '',
-				classifyTwo: '', //分类二
+				classifyTwo: [{"id": 0,"name": "全部"}], //分类二
 				classifyTwoName: '',
-				classifyThree: '', //分类三
+				classifyThree: [{"id": 0,"name": "全部"}], //分类三
 				classifyThreeName: '',
 				page: 1,
 				pageTotal: 0,
 				form: '',
-				batch:'', //批次
-				putStorageNum:'', //入库数量
+				batch: '', //批次
+				putStorageNum: '', //入库数量
 				tableData: '',
 				multipleSelection: [],
 				delList: [],
@@ -172,11 +171,11 @@
 				this.brand = '';
 				this.origin = '';
 				this.classifyId = 0;
-				this.classifyOne = '';
+				this.classifyOne = [{"id": 0,"name": "全部"}];
 				this.classifyOneName = '';
-				this.classifyTwo = '';
+				this.classifyTwo = [{"id": 0,"name": "全部"}];
 				this.classifyTwoName = '';
-				this.classifyThree = '';
+				this.classifyThree = [{"id": 0,"name": "全部"}];
 				this.classifyThreeName = '';
 				this.page = 1;
 				this.pageTotal = 0;
@@ -187,17 +186,17 @@
 			this.productCategory();
 		},
 		methods: {
-			refreshData(){
+			refreshData() {
 				//刷新列表
 				this.productName = '';
 				this.brand = '';
 				this.origin = '';
 				this.classifyId = 0;
-				this.classifyOne = '';
+				this.classifyOne = [{"id": 0,"name": "全部"}];
 				this.classifyOneName = '';
-				this.classifyTwo = '';
+				this.classifyTwo = [{"id": 0,"name": "全部"}];
 				this.classifyTwoName = '';
-				this.classifyThree = '';
+				this.classifyThree = [{"id": 0,"name": "全部"}];
 				this.classifyThreeName = '';
 				this.page = 1;
 				this.pageTotal = 0;
@@ -207,7 +206,7 @@
 			handleClickItem() {
 				// 获取遮罩层dom
 				var domImageMask = '';
-				var time = setTimeout(function(){
+				var time = setTimeout(function() {
 					domImageMask = document.querySelector(".el-image-viewer__mask");
 					if (!domImageMask) {
 						return;
@@ -217,7 +216,7 @@
 						document.querySelector(".el-image-viewer__close").click();
 						clearTimeout(time);
 					});
-				},100)
+				}, 100)
 			},
 			addProductCil(data) { //添加
 				this.addProduct = !data.addProduct;
@@ -250,11 +249,11 @@
 			},
 			//入库
 			putStorage() {
-				if(this.putStorageNum == ''){
+				if (this.putStorageNum == '') {
 					this.$message.error("请输入入库数量");
 					return
 				}
-				if(this.putStorageNum < 0){
+				if (this.putStorageNum < 0) {
 					this.$message.error("入库数量不能为负数");
 					return
 				}
@@ -279,39 +278,47 @@
 				});
 			},
 			selectOne(e) {
-				var query = {
-					data: {
-						parentId: this.classifyOne[e].id
-					}
-				};
-				shopProductCategoryt(query).then(res => {
-					this.classifyId = this.classifyOne[e].id;
-					if (res.code == 1) {
-						this.classifyTwo = res.data
-					}else{
-						this.classifyTwo = ''; //分类二
-						this.classifyTwoName = '';
-						this.classifyThree = ''; //分类三
-						this.classifyThreeName = '';
-					}
-				});
-				
+				if(this.classifyOne[e].id != 0){
+					var query = {
+						data: {
+							parentId: this.classifyOne[e].id
+						}
+					};
+					shopProductCategoryt(query).then(res => {
+						this.classifyId = this.classifyOne[e].id;
+						if (res.code == 1) {
+							// console.log(res.data)
+							res.data.map((item, index) => {
+								this.classifyTwo.push(item)
+							})
+						} else {
+							this.classifyTwo = [{"id": 0,"name": "全部"}]; //分类二
+							this.classifyTwoName = '';
+							this.classifyThree = [{"id": 0,"name": "全部"}]; //分类三
+							this.classifyThreeName = '';
+						}
+					});
+				}
 			},
 			selectTwo(e) {
-				var query = {
-					data: {
-						parentId: this.classifyTwo[e].id
-					}
-				};
-				shopProductCategoryt(query).then(res => {
-					this.classifyId = this.classifyTwo[e].id;
-					if (res.code == 1) {
-						this.classifyThree = res.data
-					}else{
-						this.classifyThree = ''; //分类三
-						this.classifyThreeName = '';
-					}
-				});
+				if(this.classifyTwo[e].id != 0){
+					var query = {
+						data: {
+							parentId: this.classifyTwo[e].id
+						}
+					};
+					shopProductCategoryt(query).then(res => {
+						this.classifyId = this.classifyTwo[e].id;
+						if (res.code == 1) {
+							res.data.map((item, index) => {
+								this.classifyThree.push(item)
+							})
+						} else {
+							this.classifyThree = [{"id": 0,"name": "全部"}]; //分类三
+							this.classifyThreeName = '';
+						}
+					});
+				}
 			},
 			selectThree(e) {
 				this.classifyId = this.classifyThree[e].id;
@@ -335,11 +342,11 @@
 						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
-					}else if(res.code == 2){
-						if(res.data.length > 0){
+					} else if (res.code == 2) {
+						if (res.data.length > 0) {
 							this.tableData = res;
 							this.pageTotal = res.allPage;
-						}else{
+						} else {
 							this.tableData = [];
 							this.pageTotal = 0;
 						}
@@ -354,9 +361,12 @@
 					}
 				};
 				shopProductCategoryt(query).then(res => {
-					console.log(res)
+					// console.log(res)
 					if (res.code == 1) {
-						this.classifyOne = res.data
+						res.data.map((item, index) => {
+							this.classifyOne.push(item)
+						})
+						
 					}
 				});
 			},
@@ -387,7 +397,7 @@
 
 			open() {
 				this.addProduct = true;
-				if(this.$refs.addChild){
+				if (this.$refs.addChild) {
 					this.$refs.addChild.productCategory();
 				}
 			},
@@ -421,10 +431,10 @@
 				this.idx = index;
 				// this.form = row;
 				this.editProduct = true;
-				if(this.$refs.child){
+				if (this.$refs.child) {
 					this.$refs.child.getProduct(row.id);
 				}
-				
+
 			},
 			// 分页导航
 			handlePageChange(val) {

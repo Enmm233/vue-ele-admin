@@ -108,6 +108,8 @@
 				this.promotionId = '';
 				this.gosInfo = '';
 				this.specDate = '';
+				this.$refs.Goods_c.productUrl = '',
+				this.$refs.Goods_c.productRemove()
 				// this.$router.push('/goods_list')
 				// this.$message.error('错了哦，这是一条错误消息');
 			},
@@ -144,11 +146,17 @@
 				} else if (this.gosInfo.classifyId != 0 && this.gosInfo.categoryId == 0) {
 					var categoryId = this.gosInfo.classifyId;
 				}
+				//价格
+				if (this.gosInfo.waresPriceScope == '') {
+					var waresPriceScope = 0;
+				} else {
+					var waresPriceScope = this.gosInfo.waresPriceScope;
+				}
 				var query = {
 					data: {
 						//创建商品账号ID
-						// createAccountId:localStorage.getItem('account_id'),
-						createAccountId: this.accountId,
+						createAccountId:localStorage.getItem('account_id'),
+						// createAccountId: this.accountId,
 						//产品/服务ID
 						waresId: this.waresId,
 						//商品名称
@@ -162,7 +170,7 @@
 						//海报图片
 						posterImg: this.gosInfo.posterUrl,
 						//商品价格范围
-						waresPriceScope: this.gosInfo.waresPriceScope,
+						waresPriceScope: waresPriceScope,
 						//广告语
 						slogan: this.gosInfo.slogan,
 						//销售价格
@@ -236,6 +244,12 @@
 				} else if (this.gosInfo.classifyId != 0 && this.gosInfo.categoryId == 0) {
 					var categoryId = this.gosInfo.classifyId;
 				}
+				//价格
+				if (this.gosInfo.waresPriceScope == '') {
+					var waresPriceScope = 0;
+				} else {
+					var waresPriceScope = this.gosInfo.waresPriceScope;
+				}
 				var query = {
 					data: {
 						//商品ID
@@ -253,7 +267,7 @@
 						//海报图片
 						posterImg: this.gosInfo.posterUrl,
 						//商品价格范围
-						waresPriceScope: this.gosInfo.waresPriceScope,
+						waresPriceScope: waresPriceScope,
 						//广告语
 						slogan: this.gosInfo.slogan,
 						//销售价格
@@ -297,6 +311,10 @@
 			next() {
 				if (this.active == 1) {
 					//产品信息
+					if (this.$refs.Goods_a.goodsAData == '') {
+						this.$message.error("请选择商品");
+						return;
+					}
 					let goos_list = this.$refs.Goods_a.goodsAData;
 					this.$refs.Goods_b.goodsType = this.$refs.Goods_a.goodsType;
 					this.$refs.Goods_b.form.contractOneList = this.$refs.Goods_a.contractOneList;
@@ -306,7 +324,6 @@
 						arrB.push(item.id)
 					})
 					this.waresId = arrB.toString()
-
 				}
 				if (this.active == 2) {
 					//商品信息
@@ -342,8 +359,6 @@
 							return;
 						}
 					}
-
-					// console.log(this.gosInfo)
 				}
 				if (this.active == 3) {
 					//规格信息
@@ -464,7 +479,7 @@
 
 
 						//一二级产品类型
-						console.log(res.data.waresType)
+						// console.log(res.data.waresType)
 						if (res.data.waresType == 1) {
 							if (!res.data.categoryIds && typeof(res.data.categoryIds) != 'undefined' && res.data.categoryIds != 0) {} else {
 
@@ -483,45 +498,43 @@
 							}
 						}
 						if (res.data.waresType == 2) {
+							
 							var query = {
 								data: {
 									waresType: 2
 								}
 							};
-							getMerchandiseCategories(query).then(res => {
-								if (res.code == 1) {
-									this.$refs.Goods_b.form.contractOneList = res.data
-								}
-							});
-							console.log(res.data.categoryIds)
-							if (!res.data.categoryIds && typeof(res.data.categoryIds) != 'undefined' && res.data.categoryIds != 0) {} else {
-								var str = res.data.categoryId;
-								var arr = res.data.categoryIds.split(',');
-								
-								if (arr.length > 1) {
-									this.$refs.Goods_b.form.contractOneList.map(item => {
-										if (item.id == arr[0]) {
-											this.$refs.Goods_b.form.categoryId = item.id;
-											this.$refs.Goods_b.form.contractOne = item.name;
-											console.log(this.$refs.Goods_b.form.contractOne)
-											this.$refs.Goods_b.form.contractTwoList = item.kidList;
-											this.$refs.Goods_b.form.contractTwoList.map((i) => {
-												if (i.id == arr[1]) {
-													this.$refs.Goods_b.form.categoryId = i.id;
-													this.$refs.Goods_b.form.contractTwo = i.name;
-													this.$refs.Goods_b.form.contractThreeList = i.kidList;
-													this.$refs.Goods_b.form.contractThreeList.map((j) => {
-														if (j.id == str) {
-															this.$refs.Goods_b.form.categoryId = j.id;
-															this.$refs.Goods_b.form.contractThree = j.name;
+							getMerchandiseCategories(query).then(item => {
+								if (item.code == 1) {
+									this.$refs.Goods_a.contractOneList = item.data;
+									if (!res.data.categoryIds && typeof(res.data.categoryIds) != 'undefined' && res.data.categoryIds != 0) {} else {
+										var str = res.data.categoryId;
+										var arr = res.data.categoryIds.split(',');
+										if (arr.length > 1) {
+											item.data.map(item => {
+												if (item.id == arr[0]) {
+													this.$refs.Goods_b.form.categoryId = item.id;
+													this.$refs.Goods_b.form.contractOne = item.name;
+													this.$refs.Goods_b.form.contractTwoList = item.kidList;
+													this.$refs.Goods_b.form.contractTwoList.map((i) => {
+														if (i.id == arr[1]) {
+															this.$refs.Goods_b.form.categoryId = i.id;
+															this.$refs.Goods_b.form.contractTwo = i.name;
+															this.$refs.Goods_b.form.contractThreeList = i.kidList;
+															this.$refs.Goods_b.form.contractThreeList.map((j) => {
+																if (j.id == str) {
+																	this.$refs.Goods_b.form.categoryId = j.id;
+																	this.$refs.Goods_b.form.contractThree = j.name;
+																}
+															})
 														}
 													})
 												}
 											})
 										}
-									})
+									}
 								}
-							}
+							});
 						}
 
 						//单位
@@ -633,6 +646,7 @@
 		},
 		watch: {
 			'$route.path': function(newVal, oldVal) {
+				
 				//产品列表
 				this.$refs.Goods_a.goodsAData = [];
 				//商品信息

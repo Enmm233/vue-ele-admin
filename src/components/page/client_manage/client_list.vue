@@ -124,7 +124,7 @@
 				
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						orderId: orderId,
 						loginId: this.loginId,
 						totalAmount: totalAmount,

@@ -363,7 +363,7 @@
 				}
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						orderId: orderId,
 						applyId: applyId,
 						refundStatus: this.refundStatus,
@@ -420,7 +420,7 @@
 							}
 						};
 						updShopReturnedPurchaseRefund(query).then(res => {
-							console.log(res)
+							// console.log(res)
 							if (res.code == 1) {
 								this.$message.success('已同意');
 								this.getData();

@@ -81,7 +81,7 @@
 	}
 </script>
 
-<style>
+<style scoped="scoped">
 	.spec .head_t{
 		color: #000000;
 		font-size: 1em;

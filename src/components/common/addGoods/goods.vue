@@ -125,6 +125,7 @@
 	import {
 		mapState
 	} from 'vuex'
+	import util from '../../../utils/util.js'
 	export default {
 		name: 'shuttle',
 		props: ['num'],
@@ -159,6 +160,16 @@
 				multipleSelection2: '',
 			};
 		},
+		mounted(){
+		      var that = this;
+		      util.$on('demo', function (msg) {
+		       this.goodsAData = [];
+		       if (this.goodsType == "产品") {
+		       	this.getData();
+		       	this.productCategory();
+		       }
+		      })
+		},
 		created() {
 			this.goodsAData = []
 			if (this.goodsType == "产品") {
@@ -170,6 +181,18 @@
 			selectType(e) {
 				this.goodsAData = [];
 				this.goodsAList = [];
+				this.classifyId = 0; //分类ID
+				this.classifyOneName = '';
+				this.classifyTwo = ''; //分类二
+				this.classifyTwoName = '';
+				this.classifyThree = ''; //分类三
+				this.classifyThreeName = '';
+				this.categoryId = 0;
+				this.contractOne = '';
+				this.contractTwo = '';
+				this.contractTwoList = [];
+				this.contractThree = '';
+				this.contractThreeList = [];
 				this.page = 1;
 				this.pageTotal = 0;
 				if (e == "产品") {
@@ -183,7 +206,7 @@
 			getDatab() {
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						serviceName: '',
 						categoryId: this.categoryId,
 						brandName: '',
@@ -247,7 +270,7 @@
 				this.goodsAData = [];
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						productName: '',
 						brand: '',
 						placeOrigin: '',
@@ -323,7 +346,12 @@
 			// 分页导航
 			handlePageChange(val) {
 				this.page = val;
-				this.getData();
+				if (this.goodsType == "产品") {
+					this.getData()
+				}
+				if (this.goodsType == "服务") {
+					this.getDatab();
+				}
 			},
 			handleSelectionChange1(val) {
 				this.multipleSelection1 = val;

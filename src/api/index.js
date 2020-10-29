@@ -415,4 +415,21 @@ export const getWaresQrCode = query => {
 };
 
 
+export const addShopStoreCommentReply = query => {
+    return request({  //增加商铺评论回复
+        url: '/api/merchant/add_shopStoreCommentReply',
+        method: 'post',
+        params: query
+    });
+};
+
+export const delImg = query => {
+    return request({  //删除图片
+        url: '/api/delImg',
+        method: 'post',
+        params: query
+    });
+};
+
+
 

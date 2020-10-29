@@ -27,9 +27,9 @@
 
 					<el-form-item label="产品图片">
 						<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:300*300像素，最多1张</div>
-						<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1"
-						 :on-success="productSuccess" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleProductPreview"
-						 :on-remove="productRemove" :file-list="productList">
+						<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1" :on-success="productSuccess"
+						 :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleProductPreview" :on-remove="productRemove"
+						 :file-list="productList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showProductImg" append-to-body>
@@ -38,9 +38,9 @@
 					</el-form-item>
 					<el-form-item label="品牌图片">
 						<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:300*300像素，最多1张</div>
-						<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1"
-						 :on-success="brandSuccess" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleBrandPreview"
-						 :on-remove="brandRemove" :file-list="brandList">
+						<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1" :on-success="brandSuccess"
+						 :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleBrandPreview" :on-remove="brandRemove"
+						 :file-list="brandList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showBrandImg" append-to-body>
@@ -54,10 +54,10 @@
 					</el-form-item>
 					<el-form-item label="产品单位">
 						<!-- <el-select v-model="ruleForm.unit" placeholder="选择产品单位"> -->
-							
-							<el-input v-model="ruleForm.unit" placeholder="请输入产品单位"></el-input>
-							
-							<!-- <el-option v-for="(item,index) in ruleForm.unitList" :key="item.name" :label="item.name" :value="item.name">
+
+						<el-input v-model="ruleForm.unit" placeholder="请输入产品单位"></el-input>
+
+						<!-- <el-option v-for="(item,index) in ruleForm.unitList" :key="item.name" :label="item.name" :value="item.name">
 							</el-option> -->
 						</el-select>
 					</el-form-item>
@@ -96,26 +96,29 @@
 	import {
 		shopProductCategoryt,
 		upLoadImg,
-		addShopProduct
+		addShopProduct,
+		delImg
 	} from '../../../api/index.js';
 	import select from '../../../../public/select.json'
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		name: 'info',
-		computed:{
-			...mapState(['imgUrl','accountId','imgStr']),  //显示state的数据
+		computed: {
+			...mapState(['imgUrl', 'accountId', 'imgStr']), //显示state的数据
 		},
-		props: ['shopProductId','addProduct'],
+		props: ['shopProductId', 'addProduct'],
 		data() {
 			return {
 				productImg: '', //预览产品图片路径
 				productUrl: '', //后台返回的产品图片路径
-				productList: [], 
+				productList: [],
 				showProductImg: false, //是否显示产品图片预览
 
 				brandImg: '', //预览品牌图片路径
 				brandUrl: '', //后台返回的品牌图片路径
-				brandList: [], 
+				brandList: [],
 				showBrandImg: false, //是否显示品牌图片预览
 				query: { //上传图片固定参数
 					data: "{'flag': '3'}"
@@ -155,7 +158,14 @@
 				this.showProductImg = true;
 			},
 			productRemove(file, fileList) { //产品图片删除
-				this.productUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.productUrl = '';
+				});
 			},
 
 			brandSuccess(res, file) { //品牌图片上传成功
@@ -166,7 +176,14 @@
 				this.showBrandImg = true;
 			},
 			brandRemove(file, fileList) { //品牌图片删除
-				this.brandUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.brandUrl = '';
+				});
 			},
 			beforeAvatarUpload(file) {
 				const isLt3M = file.size / 1024 / 1024 < 3;
@@ -181,23 +198,23 @@
 			},
 			submitForm() { //确认添加
 				var form = this.ruleForm;
-				if(form.name == ''){
+				if (form.name == '') {
 					this.$message.error('产品名称不能为空');
 					return;
 				}
-				if(form.classifyOneName == ''){
+				if (form.classifyOneName == '') {
 					this.$message.error('产品一类不能为空');
 					return;
 				}
-				if(form.classifyTwoName == ''){
+				if (form.classifyTwoName == '') {
 					this.$message.error('产品二类不能为空');
 					return;
 				}
-				if(form.classifyThreeName == ''){
+				if (form.classifyThreeName == '') {
 					this.$message.error('产品三类不能为空');
 					return;
 				}
-				if(form.productUrl == ''){
+				if (form.productUrl == '') {
 					this.$message.error('产品图片不能为空');
 					return;
 				}
@@ -221,7 +238,7 @@
 						useEnvironment: form.useEnvironment, //储藏环境
 						instructions: form.instructions, //使用说明
 						dangerAlert: form.dangerAlert, //注意事项
-						createUserId: this.accountId, //创建用户编号
+						createUserId: localStorage.getItem('account_id'), //创建用户编号
 					}
 				};
 				addShopProduct(query).then(res => {

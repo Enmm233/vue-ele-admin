@@ -65,7 +65,7 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	.spec .spec_right {
 		border: 1px solid #EBEEF5;
 		cursor: pointer;

@@ -158,6 +158,7 @@
 						localStorage.setItem('ms_username', res.data.userAccount.nickName);
 						localStorage.setItem('account_id', res.data.userAccount.id);
 						localStorage.setItem('login_id', res.data.userAccount.loginId);
+						// alert(1)
 						this.$router.push('/product_list');
 					}
 				});
@@ -175,7 +176,7 @@
 				}
 			},
 			handleClick(tab, event) {
-				console.log(tab, event);
+				// console.log(tab, event);
 			},
 			submitForm() {
 				this.$refs.login.validate(valid => {
@@ -185,7 +186,7 @@
 						this.$router.push('/');
 					} else {
 						this.$message.error('请输入账号和密码');
-						console.log('error submit!!');
+						// console.log('error submit!!');
 						return false;
 					}
 				});

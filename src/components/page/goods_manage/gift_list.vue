@@ -10,32 +10,20 @@
 					<el-form-item label="赠品类型">
 						<div class="flex flex_wrap">
 							<el-select v-model="giftTypeStr" placeholder="默认" @change="giftTypeCil" class="handle-select mr10">
-								<el-option
-								  v-for="(item,index) in giftTypeList"
-								  :key="item.type"
-								  :label="item.val"
-								  :value="index">
+								<el-option v-for="(item,index) in giftTypeList" :key="item.type" :label="item.val" :value="index">
 								</el-option>
 							</el-select>
 							<el-select v-model="giftSortStr" placeholder="默认" @change="giftSortCil" class="handle-select mr10">
-								<el-option
-								  v-for="(item,index) in giftSortList"
-								  :key="item.type"
-								  :label="item.val"
-								  :value="index">
+								<el-option v-for="(item,index) in giftSortList" :key="item.type" :label="item.val" :value="index">
 								</el-option>
 							</el-select>
-							
+
 						</div>
 					</el-form-item>
 					<el-form-item label="赠品来源">
 						<div class="flex flex_wrap">
 							<el-select v-model="giftSourceStr" placeholder="默认" @change="giftSourceCil" class="handle-select mr10">
-								<el-option
-								  v-for="(item,index) in giftSourceList"
-								  :key="item.type"
-								  :label="item.val"
-								  :value="index">
+								<el-option v-for="(item,index) in giftSourceList" :key="item.type" :label="item.val" :value="index">
 								</el-option>
 							</el-select>
 						</div>
@@ -76,11 +64,7 @@
 				</el-table-column>
 				<el-table-column label="赠品图片" align="center" width="100">
 					<template slot-scope="scope">
-						<el-image 
-						class="table-td-thumb" 
-						:src="imgUrl+scope.row.giftImg" 
-						@click.stop="handleClickItem" 
-						:preview-src-list="[imgUrl+scope.row.giftImg]"></el-image>
+						<el-image class="table-td-thumb" :src="imgUrl+scope.row.giftImg" @click.stop="handleClickItem" :preview-src-list="[imgUrl+scope.row.giftImg]"></el-image>
 					</template>
 				</el-table-column>
 				<el-table-column label="赠品来源" width="100">
@@ -107,8 +91,7 @@
 				</el-table-column>
 			</el-table>
 			<div class="pagination">
-				<el-pagination background layout="total, prev, pager, next"
-				 :page-count="pageTotal" :page-size="10" @current-change="handlePageChange"></el-pagination>
+				<el-pagination background layout="total, prev, pager, next" :page-count="pageTotal" :page-size="10" @current-change="handlePageChange"></el-pagination>
 			</div>
 		</div>
 
@@ -122,19 +105,11 @@
 						<el-form-item label="赠品类型">
 							<div>
 								<el-select v-model="giftItem.giftTypeStr" placeholder="默认" @change="editGiftTypeCil" class="handle-select mr10">
-									<el-option
-									  v-for="(item,index) in giftItem.giftTypeList"
-									  :key="item.type"
-									  :label="item.val"
-									  :value="index">
+									<el-option v-for="(item,index) in giftItem.giftTypeList" :key="item.type" :label="item.val" :value="index">
 									</el-option>
 								</el-select>
 								<el-select v-model="giftItem.giftSortStr" placeholder="默认" @change="editGiftSortCil" class="handle-select mr10">
-									<el-option
-									  v-for="(item,index) in giftItem.giftSortList"
-									  :key="item.type"
-									  :label="item.val"
-									  :value="index">
+									<el-option v-for="(item,index) in giftItem.giftSortList" :key="item.type" :label="item.val" :value="index">
 									</el-option>
 								</el-select>
 							</div>
@@ -145,11 +120,7 @@
 						<el-form-item label="赠品来源">
 							<div>
 								<el-select v-model="giftItem.giftSourceStr" placeholder="默认" @change="editGiftSourceCil" class="handle-select mr10">
-									<el-option
-									  v-for="(item,index) in giftItem.giftSourceList"
-									  :key="item.type"
-									  :label="item.val"
-									  :value="index">
+									<el-option v-for="(item,index) in giftItem.giftSourceList" :key="item.type" :label="item.val" :value="index">
 									</el-option>
 								</el-select>
 							</div>
@@ -157,7 +128,7 @@
 						<el-form-item label="赠品单位">
 							<div>
 								<el-input v-model="giftItem.giftCompany" placeholder="输入赠品单位"></el-input>
-							<!-- 	<el-select v-model="giftItem.giftCompanyStr" placeholder="默认" @change="editGiftCompanyCil" class="handle-select mr10">
+								<!-- 	<el-select v-model="giftItem.giftCompanyStr" placeholder="默认" @change="editGiftCompanyCil" class="handle-select mr10">
 									<el-option
 									  v-for="(item,index) in giftItem.giftCompanyList"
 									  :key="item.type"
@@ -173,23 +144,14 @@
 						<el-form-item label="赠品图片" prop="region">
 							<div>图片大小不能超过3M 建议尺寸：300*300像素，最多1张</div>
 							<div class="flex">
-							<!-- 	<el-image
+								<!-- 	<el-image
 									v-if="giftItem.giftImg != ''"
 									style="width: 148px; height: 148px; margin-right: 10px;"
 									:src="giftItem.giftImg" />
 								</el-image> -->
-								<el-upload 
-								:action="imgStr" 
-								:data="query" 
-								list-type="picture-card" 
-								:limit="1" 
-								ref="my-upload" 
-								:on-success="productSuccess" 
-								:before-upload="beforeAvatarUpload" 
-								:on-exceed="handleExceed" 
-								:on-preview="handleProductPreview"
-								:on-remove="productRemove"
-								:file-list="giftImgList">
+								<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1" ref="my-upload" :on-success="productSuccess"
+								 :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleProductPreview" :on-remove="productRemove"
+								 :file-list="giftImgList">
 									<i class="el-icon-plus"></i>
 								</el-upload>
 							</div>
@@ -216,70 +178,73 @@
 		delShopGift,
 		selShopGift,
 		updShopGift,
-		addShopGift
+		addShopGift,
+		delImg
 	} from '../../../api/index';
 	import select from '../../../../public/select.json'
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		name: 'giftList',
-		computed:{
-			...mapState(['imgUrl','accountId','imgStr']),  //显示state的数据
+		computed: {
+			...mapState(['imgUrl', 'accountId', 'imgStr']), //显示state的数据
 		},
 		data() {
-			return { 
-				giftName:'',  //赠品名称
-				giftType:0,   //赠品类型
-				giftTypeStr:'',   //赠品类型文字
-				giftTypeList:select.giftTypeList,
-				
-				giftSort:0,   //类型分类
-				giftSortStr:'',   
-				giftSortList:'',   
-				
-				giftSource:0,   //赠品来源
-				giftSourceStr:'',   
-				giftSourceList:select.giftSourceList,   
-				giftNum:'',   //赠品数量
-				page:1,
+			return {
+				giftName: '', //赠品名称
+				giftType: 0, //赠品类型
+				giftTypeStr: '', //赠品类型文字
+				giftTypeList: select.giftTypeList,
+
+				giftSort: 0, //类型分类
+				giftSortStr: '',
+				giftSortList: '',
+
+				giftSource: 0, //赠品来源
+				giftSourceStr: '',
+				giftSourceList: select.giftSourceList,
+				giftNum: '', //赠品数量
+				page: 1,
 				pageTotal: 0,
 				tableData: [],
-				
+
 				productImg: '', //预览产品图片路径
 				productUrl: '', //后台返回的产品图片路径
-				giftImgList:[],  //赠品图片
+				giftImgList: [], //赠品图片
 				showProductImg: false, //是否显示产品图片预览
 				query: { //上传图片固定参数
 					data: "{'flag': '3'}"
 				},
 				// 单个赠品详情
-				giftItem:{
-					giftId:'',  //赠品编号
-					type:'',      //1是添加  2是编辑
-					giftName:'',  //赠品名称
-					giftType:0,   //赠品类型
-					giftTypeStr:'',   //赠品类型文字
-					giftTypeList:select.giftTypeList,
-					
-					giftSort:0,   //类型分类
-					giftSortStr:'',   
-					giftSortList:'',   
-					
-					giftSource:0,   //赠品来源
-					giftSourceStr:'',   
-					giftSourceList:select.giftSourceList,
-					
-					giftCompany:'',   //单位
+				giftItem: {
+					giftId: '', //赠品编号
+					type: '', //1是添加  2是编辑
+					giftName: '', //赠品名称
+					giftType: 0, //赠品类型
+					giftTypeStr: '', //赠品类型文字
+					giftTypeList: select.giftTypeList,
+
+					giftSort: 0, //类型分类
+					giftSortStr: '',
+					giftSortList: '',
+
+					giftSource: 0, //赠品来源
+					giftSourceStr: '',
+					giftSourceList: select.giftSourceList,
+
+					giftCompany: '', //单位
 					// giftCompanyStr:'',   
-					giftCompanyList:select.giftCompanyList,
-					giftPrice:'',  //赠品单价
-					giftNum:'',  //赠品数量
-					giftImg:'',  //赠品图片
-					storeId:''   //店铺ID
+					giftCompanyList: select.giftCompanyList,
+					giftPrice: '', //赠品单价
+					giftNum: '', //赠品数量
+					giftImg: '', //赠品图片
+					storeId: '' //店铺ID
 				},
-				
-				
+
+
 				dialogVisible: false,
-				dialogImageUrl:'',
+				dialogImageUrl: '',
 				multipleSelection: [],
 				delList: [],
 				form: {},
@@ -292,24 +257,24 @@
 			this.getData();
 		},
 		methods: {
-			refreshData(){
-			   //刷新列表
-			   this.giftName = '';
-			   this.giftType = 0;
-			   this.giftTypeStr = '';
-			   this.giftSort = 0;
-			   this.giftSortStr = '';
-			   this.giftSource = 0;
-			   this.giftSourceStr = '';
-			   this.giftNum = '';
-			   this.page = 1;
-			   this.pageTotal = 0;
-			   this.getData();
-			  },
+			refreshData() {
+				//刷新列表
+				this.giftName = '';
+				this.giftType = 0;
+				this.giftTypeStr = '';
+				this.giftSort = 0;
+				this.giftSortStr = '';
+				this.giftSource = 0;
+				this.giftSourceStr = '';
+				this.giftNum = '';
+				this.page = 1;
+				this.pageTotal = 0;
+				this.getData();
+			},
 			handleClickItem() {
 				// 获取遮罩层dom
 				var domImageMask = '';
-				var time = setTimeout(function(){
+				var time = setTimeout(function() {
 					domImageMask = document.querySelector(".el-image-viewer__mask");
 					if (!domImageMask) {
 						return;
@@ -319,72 +284,72 @@
 						document.querySelector(".el-image-viewer__close").click();
 						clearTimeout(time);
 					});
-				},100)
+				}, 100)
 			},
 			//点发送
-			submit(){
-				if(this.giftItem.type == 1){
+			submit() {
+				if (this.giftItem.type == 1) {
 					//添加
 					this.addGift()
 					// addShopGift
-				}else if(this.giftItem.type == 2){
+				} else if (this.giftItem.type == 2) {
 					//编辑
 					this.editGift()
 				}
 			},
 			//添加请求
-			addGift(){
+			addGift() {
 				var item = this.giftItem;
-				if(item.giftName == ''){
+				if (item.giftName == '') {
 					this.$message.error('请输入赠品名称');
 					return
 				}
-				if(item.giftType == 0){
+				if (item.giftType == 0) {
 					this.$message.error('请选择赠品类型');
 					return
 				}
-				if(item.giftPrice == ''){
+				if (item.giftPrice == '') {
 					this.$message.error('请输入赠品价格');
 					return
 				}
-				if(item.giftSource == 0){
+				if (item.giftSource == 0) {
 					this.$message.error('请选择赠品来源');
 					return
 				}
-				if(item.giftCompany == ''){
+				if (item.giftCompany == '') {
 					this.$message.error('请输入赠品单位');
 					return
 				}
-				if(item.giftNum == 0){
+				if (item.giftNum == 0) {
 					this.$message.error('请输入赠品数量');
 					return
 				}
-				if(item.giftPrice < 0 || item.giftNum < 0){
+				if (item.giftPrice < 0 || item.giftNum < 0) {
 					this.$message.error("禁止输入负数");
 					return;
 				}
-			
+
 				var img = '';
-				if(item.giftImg != ''){
+				if (item.giftImg != '') {
 					img = item.giftImg
-				}else{
+				} else {
 					img = this.productUrl
 				}
 				var query = {
-					data:{
-						accountId:this.accountId,
-						giftName:item.giftName,
-						giftType:item.giftType,
-						giftSort:item.giftSort,
-						giftPrice:item.giftPrice,
-						giftSource:item.giftSource,
-						giftCompany:item.giftCompany,
-						giftNum:item.giftNum,
-						giftImg:img,
+					data: {
+						accountId: localStorage.getItem('account_id'),
+						giftName: item.giftName,
+						giftType: item.giftType,
+						giftSort: item.giftSort,
+						giftPrice: item.giftPrice,
+						giftSource: item.giftSource,
+						giftCompany: item.giftCompany,
+						giftNum: item.giftNum,
+						giftImg: img,
 					}
 				};
 				addShopGift(query).then(res => {
-					if(res.code == 1){
+					if (res.code == 1) {
 						this.dialogVisible = false;
 						this.productUrl = '';
 						this.productImg = '';
@@ -395,59 +360,59 @@
 				});
 			},
 			//编辑请求
-			editGift(){
+			editGift() {
 				var item = this.giftItem;
-				if(item.giftName == ''){
+				if (item.giftName == '') {
 					this.$message.error('请输入赠品名称');
 					return
 				}
-				if(item.giftType == 0){
+				if (item.giftType == 0) {
 					this.$message.error('请选择赠品类型');
 					return
 				}
-				if(item.giftPrice == ''){
+				if (item.giftPrice == '') {
 					this.$message.error('请输入赠品价格');
 					return
 				}
-				if(item.giftSource == 0){
+				if (item.giftSource == 0) {
 					this.$message.error('请选择赠品来源');
 					return
 				}
-				if(item.giftCompany == 0){
+				if (item.giftCompany == 0) {
 					this.$message.error('请选择赠品单位');
 					return
 				}
-				if(item.giftNum == 0){
+				if (item.giftNum == 0) {
 					this.$message.error('请输入赠品数量');
 					return
 				}
-				if(item.giftPrice < 0 || item.giftNum < 0){
+				if (item.giftPrice < 0 || item.giftNum < 0) {
 					this.$message.error("禁止输入负数");
 					return;
 				}
-							
+
 				var img = '';
-				if(item.giftImg != ''){
+				if (item.giftImg != '') {
 					img = item.giftImg
-				}else{
+				} else {
 					img = this.productUrl
 				}
 				var query = {
-					data:{
-						giftId:item.giftId,
-						giftName:item.giftName,
-						giftType:item.giftType,
-						giftSort:item.giftSort,
-						giftPrice:item.giftPrice,
-						giftSource:item.giftSource,
-						giftCompany:item.giftCompany,
-						giftNum:item.giftNum,
-						giftImg:img,
-						storeId:item.storeId,
+					data: {
+						giftId: item.giftId,
+						giftName: item.giftName,
+						giftType: item.giftType,
+						giftSort: item.giftSort,
+						giftPrice: item.giftPrice,
+						giftSource: item.giftSource,
+						giftCompany: item.giftCompany,
+						giftNum: item.giftNum,
+						giftImg: img,
+						storeId: item.storeId,
 					}
 				};
 				updShopGift(query).then(res => {
-					if(res.code == 1){
+					if (res.code == 1) {
 						this.dialogVisible = false;
 						this.$refs['my-upload'].clearFiles();
 						this.productUrl = '';
@@ -467,11 +432,19 @@
 				this.showProductImg = true;
 			},
 			productRemove(file, fileList) { //产品图片删除
-				this.productUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.productUrl = '';
+				});
+				// this.productUrl = '';
 			},
 			beforeAvatarUpload(file) {
 				const isLt3M = file.size / 1024 / 1024 < 3;
-			
+
 				if (!isLt3M) {
 					this.$message.error('上传头像图片大小不能超过 3MB!');
 				}
@@ -481,142 +454,143 @@
 				this.$message.warning(`上传文件超出限制`);
 			},
 			//点击添加
-			handleAdd(){
+			handleAdd() {
 				this.dialogVisible = true;
 				this.giftImgList = [];
 				// 单个赠品详情
 				this.giftItem = {
-					giftId:'',  //赠品编号
-					type:1,      //1是添加  2是编辑
-					giftName:'',  //赠品名称
-					giftType:0,   //赠品类型
-					giftTypeStr:'',   //赠品类型文字
-					giftTypeList:select.giftTypeList,
-					
-					giftSort:0,   //类型分类
-					giftSortStr:'',   
-					giftSortList:'',   
-					
-					giftSource:0,   //赠品来源
-					giftSourceStr:'',   
-					giftSourceList:select.giftSourceList,
-					
-					giftCompany:'',   //单位
+					giftId: '', //赠品编号
+					type: 1, //1是添加  2是编辑
+					giftName: '', //赠品名称
+					giftType: 0, //赠品类型
+					giftTypeStr: '', //赠品类型文字
+					giftTypeList: select.giftTypeList,
+
+					giftSort: 0, //类型分类
+					giftSortStr: '',
+					giftSortList: '',
+
+					giftSource: 0, //赠品来源
+					giftSourceStr: '',
+					giftSourceList: select.giftSourceList,
+
+					giftCompany: '', //单位
 					// giftCompanyStr:'',   
-					giftCompanyList:select.giftCompanyList,
-					giftPrice:'',  //赠品单价
-					giftNum:'',  //赠品数量
-					giftImg:'',  //赠品图片
-					storeId:''   //店铺ID
+					giftCompanyList: select.giftCompanyList,
+					giftPrice: '', //赠品单价
+					giftNum: '', //赠品数量
+					giftImg: '', //赠品图片
+					storeId: '' //店铺ID
 				};
 			},
 			//查看编辑
 			handleEdit(index, row) {
+				this.giftImgList = []; //赠品图片
 				this.dialogVisible = true;
 				var query = {
-					data:{
-						shopGiftId:row.giftId
+					data: {
+						shopGiftId: row.giftId
 					}
 				};
 				selShopGift(query).then(res => {
-					if(res.code == 1){
+					if (res.code == 1) {
 						var list = '';
 						var listStr = '';
-						if(res.data.giftSort != 0){
+						if (res.data.giftSort != 0) {
 							list = select.giftTypeList[res.data.giftType - 1].data;
 							listStr = list[res.data.giftSort - 1].val
 						}
 						// 单个赠品详情
 						this.giftItem = {
-							type:2,  //赠品名称
-							giftId:res.data.giftId,
-							giftName:res.data.giftName,  //赠品名称
-							giftType:res.data.giftType,   //赠品类型
-							giftTypeStr:select.giftTypeList[res.data.giftType - 1].val,   //赠品类型文字
-							giftTypeList:select.giftTypeList,
-							
-							giftSort:res.data.giftSort,   //类型分类
-							giftSortStr:listStr,   
-							giftSortList:list,   
-							
-							giftSource:res.data.giftSource,   //赠品来源
-							giftSourceStr:select.giftSourceList[res.data.giftSource - 1].val,   
-							giftSourceList:select.giftSourceList,
-							
-							giftCompany:res.data.giftCompany,   //单位
+							type: 2, //赠品名称
+							giftId: res.data.giftId,
+							giftName: res.data.giftName, //赠品名称
+							giftType: res.data.giftType, //赠品类型
+							giftTypeStr: select.giftTypeList[res.data.giftType - 1].val, //赠品类型文字
+							giftTypeList: select.giftTypeList,
+
+							giftSort: res.data.giftSort, //类型分类
+							giftSortStr: listStr,
+							giftSortList: list,
+
+							giftSource: res.data.giftSource, //赠品来源
+							giftSourceStr: select.giftSourceList[res.data.giftSource - 1].val,
+							giftSourceList: select.giftSourceList,
+
+							giftCompany: res.data.giftCompany, //单位
 							// giftCompanyStr:select.giftCompanyList[res.data.giftCompany-1].val,   
-							giftCompanyList:select.giftCompanyList,
-							
-							giftPrice:res.data.giftPrice,  //赠品单价
-							giftNum:res.data.giftNum,  //赠品数量
-							giftImg:res.data.giftImg,  //赠品图片
-							storeId:res.data.storeId   //店铺ID
+							giftCompanyList: select.giftCompanyList,
+
+							giftPrice: res.data.giftPrice, //赠品单价
+							giftNum: res.data.giftNum, //赠品数量
+							giftImg: res.data.giftImg, //赠品图片
+							storeId: res.data.storeId //店铺ID
 						};
 						//产品图片
 						var urlStr = res.data.giftImg.split(',');
 						urlStr.forEach(item => {
 							let obj = new Object();
-							obj.url = this.imgUrl+item;
+							obj.url = this.imgUrl + item;
 							this.giftImgList.push(obj);
 						});
 					}
 				});
 			},
 			//编辑赠品类型
-			editGiftTypeCil(e){
+			editGiftTypeCil(e) {
 				this.giftItem.giftType = this.giftItem.giftTypeList[e].type;
 				this.giftItem.giftSort = 0;
 				this.giftItem.giftSortStr = '';
-				if(this.giftItem.giftTypeList[e].data){
+				if (this.giftItem.giftTypeList[e].data) {
 					this.giftItem.giftSortList = this.giftItem.giftTypeList[e].data;
-				}else{
+				} else {
 					this.giftItem.giftSortList = '';
 				}
 			},
 			//编辑赠品类型分类
-			editGiftSortCil(e){
+			editGiftSortCil(e) {
 				this.giftItem.giftSort = this.giftItem.giftSortList[e].type;
 			},
 			//编辑赠品来源
-			editGiftSourceCil(e){
+			editGiftSourceCil(e) {
 				this.giftItem.giftSource = this.giftItem.giftSourceList[e].type;
 			},
 			//编辑赠品单位
-			editGiftCompanyCil(e){
+			editGiftCompanyCil(e) {
 				this.giftItem.giftCompany = this.giftItem.giftCompanyList[e].type;
 			},
 			//搜索赠品类型
-			giftTypeCil(e){
+			giftTypeCil(e) {
 				this.giftType = this.giftTypeList[e].type;
 				this.giftSort = 0;
 				this.giftSortStr = '';
-				if(this.giftTypeList[e].data){
+				if (this.giftTypeList[e].data) {
 					this.giftSortList = this.giftTypeList[e].data;
-				}else{
+				} else {
 					this.giftSortList = '';
 				}
 			},
 			//搜索赠品类型分类
-			giftSortCil(e){
+			giftSortCil(e) {
 				this.giftSort = this.giftSortList[e].type;
 			},
 			//搜索赠品来源
-			giftSourceCil(e){
+			giftSourceCil(e) {
 				this.giftSource = this.giftSourceList[e].type;
 			},
 			// 获取列表
 			getData() {
 				var query = {
-					data:{
-						// accountId:localStorage.getItem('account_id'),
-						accountId:this.accountId,
-						giftName:this.giftName,
-						giftType:this.giftType,
-						giftSort:this.giftSort,  		 
-						giftSource:this.giftSource,  	 
-						giftNum:this.giftNum ? this.giftNum : -1,  	 
-						nowPage:this.page,
-						pageCount:9,
+					data: {
+						accountId:localStorage.getItem('account_id'),
+						// accountId: this.accountId,
+						giftName: this.giftName,
+						giftType: this.giftType,
+						giftSort: this.giftSort,
+						giftSource: this.giftSource,
+						giftNum: this.giftNum ? this.giftNum : -1,
+						nowPage: this.page,
+						pageCount: 9,
 					}
 				};
 				listShopGift(query).then(res => {
@@ -624,11 +598,11 @@
 						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
-					}else if(res.code == 2){
-						if(res.data.length > 0){
+					} else if (res.code == 2) {
+						if (res.data.length > 0) {
 							this.tableData = res;
 							this.pageTotal = res.allPage;
-						}else{
+						} else {
 							this.tableData = [];
 							this.pageTotal = 0;
 						}
@@ -645,7 +619,7 @@
 				this.page = val;
 				this.getData();
 			},
-			
+
 			// 多选操作
 			handleSelectionChange(val) {
 				this.multipleSelection = val;
@@ -658,12 +632,12 @@
 					})
 					.then(() => {
 						var query = {
-							data:{
-								shopGiftId:row.giftId
+							data: {
+								shopGiftId: row.giftId
 							}
 						};
 						delShopGift(query).then(res => {
-							if(res.code == 1){
+							if (res.code == 1) {
 								this.$message.success('删除成功');
 								this.tableData.data.splice(index, 1);
 								this.getData();

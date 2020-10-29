@@ -116,7 +116,7 @@
 								</div>
 							</div>
 							<div class="item flex">
-									<div style="width: 100%;">
+									<div style="width: 23em;">
 										<div class="conten spec">
 											<div class="spec_right">
 												<div v-for="(item,index) in goodsInfo.data">
@@ -153,7 +153,6 @@
 						</div>
 						<div class="list describe overflow-scroll-y">
 							<div v-html="goodsInfo.webDescribe"></div>
-							<!-- {{goodsInfo.webDescribe}} -->
 						</div>
 					</div>
 				</el-col>
@@ -258,15 +257,12 @@
 	}
 	
 	.goods_list .detail_box .con_body .list .item .left {
-	    width: 100%;
+	    width: 30%;
 	    text-align: start;
 	    font-size: 15px;
 	    font-weight: 600;
 	}
-	#s-desc img {
-		width: 100%;
-	}
-	.goods_list .detail_box .con_body .describe p img{
+	.goods_list .detail_box .con_body .describe img{
 		 width: 100% !important;
 	}
 	

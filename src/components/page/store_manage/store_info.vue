@@ -271,7 +271,7 @@
 				var that = this;
 				var query = {
 					data: {
-						accountId: that.accountId,
+						accountId: localStorage.getItem('account_id'),
 					}
 				};
 				getStoreByUserId(query).then(res => {
@@ -283,7 +283,6 @@
 							 urlStr2.forEach(item => {
 								that.identityList.push(that.imgUrl+item);
 							  });
-							  // console.log(this.identityList)
 						}
 						if(!res.data.businessLicense && typeof(res.data.businessLicense)!='undefined' && res.data.businessLicense!=0){
 						}else{
@@ -291,7 +290,6 @@
 							 urlStr3.forEach(item => {
 								that.businessList.push(that.imgUrl+item);
 							  });
-							  // console.log(this.businessList)
 						}
 						if(!res.data.logoImg && typeof(res.data.logoImg)!='undefined' && res.data.logoImg!=0){
 						}else{
@@ -299,7 +297,6 @@
 							 urlStr.forEach(item => {
 								that.logoImgList.push(that.imgUrl+item);
 							  });
-							  // console.log(this.logoImgList)
 						}
 						var arr = [];
 						arr = res.data.longitudeLatitude.split(',')
@@ -308,16 +305,13 @@
 						 });
 						 that.$refs.refreshMap.mapDraw(that.arriveCoor);
 						 that.$refs.refreshMap.mapCoor(that.arriveCoor);
-						 
-						 // console.log(this.arriveCoor)
-						
 						
 					}
 				});
 			},
 			// 获取地址信息
 			getPosition(data) {
-				console.log(data)
+				// console.log(data)
 			},
 			addInfo(){
 				this.isShow = true;

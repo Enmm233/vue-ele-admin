@@ -41,9 +41,9 @@
 					<el-button type="primary" @click="handleSearch">搜索</el-button>
 				</div>
 			</div>
-			
+
 			<div class="handle-box">
-			    <el-button type="success" @click="refreshData">刷新列表</el-button>
+				<el-button type="success" @click="refreshData">刷新列表</el-button>
 			</div>
 
 			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header">
@@ -120,7 +120,8 @@
 					</el-form-item>
 					<el-form-item label="运费方式">
 						<div class="flex flex_wrap">
-							<el-select v-model="shipmentsInfo.freightTypeStr" @change="freightTypeCil" placeholder="请选择运费支付方式(不选择默认是线上支付)" style="width: 100%;">
+							<el-select v-model="shipmentsInfo.freightTypeStr" @change="freightTypeCil" placeholder="请选择运费支付方式(不选择默认是线上支付)"
+							 style="width: 100%;">
 								<el-option key="1" label="货到付款" value="1"></el-option>
 								<el-option key="2" label="线上支付" value="2"></el-option>
 							</el-select>
@@ -172,18 +173,19 @@
 					address: '',
 				},
 				shipmentsInfo: {
-					receiveName:'',
-					receivePhone:'',
-					receiveAddress:'',
-					logisticsCompany:'',
-					sendName:'',
-					sendPhone:'',
-					sendAddress:'',
-					logisticsId:'',
-					freightType:2,
-					freightTypeStr:'',
+					receiveName: '',
+					receivePhone: '',
+					receiveAddress: '',
+					logisticsCompany: '',
+					sendName: '',
+					sendPhone: '',
+					sendAddress: '',
+					logisticsId: '',
+					freightType: 2,
+					freightTypeStr: '',
 				},
 				orderId: '',
+				orderInfo: '',
 				value1: [],
 			};
 		},
@@ -203,48 +205,48 @@
 			this.getData();
 		},
 		methods: {
-			refreshData(){
-			   //刷新列表
-			   this.form.orderId = '';
-			   this.form.orderStatus = 0;
-			   this.form.orderStatusStr = '';
-			   this.form.waresName = '';
-			   this.form.address = '';
-			   this.value1 = [];
-			   this.page = 1;
-			   this.pageTotal = 0;
-			   this.getData();
-			  },
-			deliver(){
-				if(this.shipmentsInfo.logisticsCompany == ''){
+			refreshData() {
+				//刷新列表
+				this.form.orderId = '';
+				this.form.orderStatus = 0;
+				this.form.orderStatusStr = '';
+				this.form.waresName = '';
+				this.form.address = '';
+				this.value1 = [];
+				this.page = 1;
+				this.pageTotal = 0;
+				this.getData();
+			},
+			deliver() {
+				if (this.shipmentsInfo.logisticsCompany == '') {
 					this.$message.error('物流公司名称不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.receiveAddress == ''){
+				if (this.shipmentsInfo.receiveAddress == '') {
 					this.$message.error('收货地址不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.receiveName == ''){
+				if (this.shipmentsInfo.receiveName == '') {
 					this.$message.error('收货人姓名不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.receivePhone == ''){
+				if (this.shipmentsInfo.receivePhone == '') {
 					this.$message.error('收货人电话不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.sendAddress == ''){
+				if (this.shipmentsInfo.sendAddress == '') {
 					this.$message.error('发货地址不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.sendName == ''){
+				if (this.shipmentsInfo.sendName == '') {
 					this.$message.error('发货人姓名不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.sendPhone == ''){
+				if (this.shipmentsInfo.sendPhone == '') {
 					this.$message.error('发货人电话不能为空');
 					return;
 				}
-				if(this.shipmentsInfo.logisticsId == ''){
+				if (this.shipmentsInfo.logisticsId == '') {
 					this.$message.error('物流单号不能为空');
 					return;
 				}
@@ -269,23 +271,23 @@
 						this.$message.success('发货成功');
 						this.shipments = false;
 						this.shipmentsInfo = {
-							receiveName:'',
-							receivePhone:'',
-							receiveAddress:'',
-							logisticsCompany:'',
-							sendName:'',
-							sendPhone:'',
-							sendAddress:'',
-							logisticsId:'',
-							freightType:2,
-							freightTypeStr:'',
+							receiveName: '',
+							receivePhone: '',
+							receiveAddress: '',
+							logisticsCompany: '',
+							sendName: '',
+							sendPhone: '',
+							sendAddress: '',
+							logisticsId: '',
+							freightType: 2,
+							freightTypeStr: '',
 						};
 						this.getData();
 					}
 				});
 			},
-			
-			freightTypeCil(data){
+
+			freightTypeCil(data) {
 				this.shipmentsInfo.freightType = data;
 			},
 			// 获取 easy-mock 的模拟数据
@@ -308,7 +310,7 @@
 				}
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						orderId: orderId,
 						orderStatus: this.form.orderStatus,
 						waresName: this.form.waresName,
@@ -319,16 +321,16 @@
 						pageCount: 9,
 					}
 				};
+
 				listWaresOrder(query).then(res => {
 					if (res.code == 1) {
-						// this.$message.success('加载成功');
 						this.tableData = res;
 						this.pageTotal = res.allPage;
-					}else if(res.code == 2){
-						if(res.data.length > 0){
+					} else if (res.code == 2) {
+						if (res.data.length > 0) {
 							this.tableData = res;
 							this.pageTotal = res.allPage;
-						}else{
+						} else {
 							this.tableData = [];
 							this.pageTotal = 0;
 						}
@@ -337,14 +339,16 @@
 			},
 			handleDetails(index, row) {
 				this.orderId = row.id;
-				console.log(row)
 				this.dialogVisible = true;
 			},
 			handleShipments(index, row) {
-				this.orderId = row.id;
+				// this.orderInfo = row;
+				this.shipmentsInfo.receiveAddress = row.sendAddress;
+				this.shipmentsInfo.receiveName = row.sendName;
+				this.shipmentsInfo.receivePhone = row.sendPhone;
 				this.shipments = true;
 			},
-		
+
 			// 触发搜索按钮
 			handleSearch() {
 				this.getData();

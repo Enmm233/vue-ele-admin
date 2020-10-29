@@ -6,7 +6,7 @@ import {
 const service = axios.create({
 	// process.env.NODE_ENV === 'development', //来判断是否开发环境
 	// easy-mock服务挂了，暂时不使用了
-	// baseURL: 'http://192.168.0.116:8080',
+	// baseURL: 'http://192.168.0.119:8080',
 	 baseURL: 'http://192.168.0.222:8080',
 	 // baseURL: ' http://127.0.0.1:8080/zhc_war',
 	 // baseURL: 'http://101.37.204.197/zhc_war',

@@ -8,7 +8,7 @@
 						<el-form-item label="商品">
 							<el-input v-model="waresName" placeholder="输入商品名称/ID" class="handle-input mr10"></el-input>
 						</el-form-item>
-						<el-form-item label="产品分类">
+						<el-form-item label="产品分类" v-if="waresType == 1 || waresType == 0">
 							<div class="flex flex_wrap">
 								<el-select v-model="classifyOneName" placeholder="请选择" @change="selectOne" class="handle-select mr10">
 									<el-option v-for="(item,index) in classifyOne" :key="item.id" :label="item.name" :value="index">
@@ -23,6 +23,20 @@
 									</el-option>
 								</el-select>
 							</div>
+						</el-form-item>
+						<el-form-item label="服务分类" v-if="waresType == 2">
+							<el-select v-model="contractOne" @change="selectOneb" placeholder="请选择" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractOneList" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
+							<el-select v-model="contractTwo" @change="selectTwob" placeholder="请选择" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractTwoList" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
+							<el-select v-model="contractThree" @change="selectThreeb" placeholder="请选择" class="handle-select mr10">
+								<el-option v-for="(item,index) in contractThreeList" :key="item.id" :label="item.name" :value="index">
+								</el-option>
+							</el-select>
 						</el-form-item>
 						<el-form-item label="货架状态">
 							<div class="flex flex_wrap">
@@ -50,7 +64,7 @@
 								</el-select>
 							</div>
 						</el-form-item>
-						
+
 					</el-form>
 				</div>
 				<div class="handle-box paddingB15 paddingT15">
@@ -78,7 +92,7 @@
 							<span v-if="scope.row.waresType == 2">服务</span>
 						</template>
 					</el-table-column>
-					<el-table-column prop="waresCompany" label="单位" width="50"></el-table-column>
+					<el-table-column prop="waresCompany" label="单位" width="80"></el-table-column>
 					<el-table-column label="产品/服务名称">
 						<template slot-scope="scope">
 							<p class="overflow-ellipsis">
@@ -86,10 +100,10 @@
 							</p>
 						</template>
 					</el-table-column>
-					<el-table-column label="销售价">
+					<el-table-column label="销售价" width="80">
 						<template slot-scope="scope">￥{{scope.row.price}}</template>
 					</el-table-column>
-					<el-table-column label="售出量">
+					<el-table-column label="售出量" width="80">
 						<template slot-scope="scope">{{scope.row.saleNumber}}</template>
 					</el-table-column>
 
@@ -111,8 +125,8 @@
 							<el-button class="ssmall_btn" style="background-color: #3B50F7;" v-if="scope.row.saleState == 2" @click="putaway(scope.$index, scope.row)">上架</el-button>
 							<el-button class="ssmall_btn" style="background-color: #30BB40;" v-if="scope.row.saleState != 1" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 							<el-button class="ssmall_btn" style="background-color: #F76262;" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-							<el-button class="ssmall_btn" style="background-color: #FFEA00;" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button>
-							<el-button class="ssmall_btn" style="background-color: #1DE9B6;" @click="handleQR(scope.$index, scope.row)">生产二维码</el-button>
+							<!-- <el-button class="ssmall_btn" style="background-color: #FFEA00;" @click="headlePutStorage(scope.$index, scope.row)">入库</el-button> -->
+							<!-- <el-button class="ssmall_btn" style="background-color: #1DE9B6;" @click="handleQR(scope.$index, scope.row)">生成二维码</el-button> -->
 						</template>
 					</el-table-column>
 				</el-table>
@@ -161,7 +175,7 @@
 					<el-button type="primary" @click="putStorage">确 定</el-button>
 				</span>
 			</el-dialog>
-			
+
 			<!-- 二维码弹出框 -->
 			<el-dialog :close-on-click-modal="false" title="商品入库" :visible.sync="editVisible4" width="50%">
 				<goods-qr ref="childqr" :id="goodsId"></goods-qr>
@@ -181,7 +195,8 @@
 		ceaseSale,
 		sale,
 		delShopWares,
-		addShopHousing
+		addShopHousing,
+		getMerchandiseCategories
 	} from '../../../api/index';
 	import select from '../../../../public/select.json'
 	import goodsDetail from '../../common/addGoods/goods_detail.vue';
@@ -198,7 +213,7 @@
 	export default {
 		name: 'goodsList',
 		computed: {
-			...mapState(['URL','imgUrl', 'accountId', 'msUsername']), //显示state的数据
+			...mapState(['URL', 'imgUrl', 'accountId', 'msUsername']), //显示state的数据
 		},
 		components: {
 			goodsDetail,
@@ -209,21 +224,59 @@
 		data() {
 			return {
 				classifyId: 0, //分类ID
-				classifyOne: '', //分类一
+				classifyOne: [{"id": 0,"name": "全部"}], //分类一
 				classifyOneName: '',
-				classifyTwo: '', //分类二
+				classifyTwo: [{"id": 0,"name": "全部"}], //分类二
 				classifyTwoName: '',
-				classifyThree: '', //分类三
+				classifyThree: [{"id": 0,"name": "全部"}], //分类三
 				classifyThreeName: '',
+
+				categoryId: 0,
+				contractOne: '',
+				contractOneList: [{"id": 0,"name": "全部"}],
+				contractTwo: '',
+				contractTwoList: [{"id": 0,"name": "全部"}],
+				contractThree: '',
+				contractThreeList: [{"id": 0,"name": "全部"}],
+
+
 				waresName: '', //商品名称
 				saleStateStr: '', //上架状态
 				saleState: 0, //上架状态
-				saleList: select.saleList, //上架状态
+				saleList: [{
+						"type": 0,
+						"val": "全部"
+					},
+					{
+						"type": 1,
+						"val": "已上架"
+					},
+					{
+						"type": 2,
+						"val": "未上架"
+					},
+					{
+						"type": 3,
+						"val": "待审核"
+					}
+				], //上架状态
 				serviceName: '', //产品服务名称
 
 				waresTypeStr: '', //物品类型名称
-				waresType: 0, //物品类型ID
-				waresTypeList: select.waresTypeList, //物品类型
+				waresType: 1, //物品类型ID
+				waresTypeList: [{
+						"type": 0,
+						"val": "全部"
+					},
+					{
+						"type": 1,
+						"val": "物品"
+					},
+					{
+						"type": 2,
+						"val": "服务"
+					}
+				], //物品类型
 
 				page: 1,
 				pageTotal: 0,
@@ -244,7 +297,6 @@
 				editVisible2: false,
 				editVisible3: false,
 				editVisible4: false,
-				pageTotal: 0,
 				form: {},
 				idx: -1,
 				id: -1,
@@ -254,24 +306,74 @@
 			'$route.path': function(newVal, oldVal) {
 				if (this.$route.query.status == 1) {
 					this.getData();
-					// util.$emit('demo','msg');
 				}
 			}
 		},
 		created() {
 			this.getData();
 			this.productCategory();
+			this.productCategoryb();
 		},
 		methods: {
+			// 获取产品分类
+			productCategoryb() {
+				var query = {
+					data: {
+						waresType: 2
+					}
+				};
+				this.contractOneList = [{"id": 0,"name": "全部"}];
+				getMerchandiseCategories(query).then(res => {
+					if (res.code == 1) {
+						res.data.map((item, index) => {
+							this.contractOneList.push(item)
+						})
+					}
+				});
+			},
+			selectOneb(index) {
+				//选择一级
+				if(this.contractOneList[index].id != 0){
+					this.classifyId = this.contractOneList[index].id;
+					
+					this.contractOneList[index].kidList.map((item, index) => {
+						this.contractTwoList.push(item)
+					})
+				}
+			},
+			selectTwob(index) {
+				//选择二级
+				if(this.contractTwoList[index].id != 0){
+					this.classifyId = this.contractTwoList[index].id;
+					
+					this.contractTwoList[index].kidList.map((item, index) => {
+						this.contractThreeList.push(item)
+					})
+				}
+			},
+			selectThreeb(index) {
+				//选择三级
+				this.classifyId = this.contractThreeList[index].id;
+				// console.log(this.categoryId)
+			},
 			refreshData() {
 				//刷新列表
 				this.classifyId = 0;
-				this.classifyOne = '';
+				this.classifyOne = [{"id": 0,"name": "全部"}];
 				this.classifyOneName = '';
-				this.classifyTwo = '';
+				this.classifyTwo = [{"id": 0,"name": "全部"}];
 				this.classifyTwoName = '';
-				this.classifyThree = '';
+				this.classifyThree = [{"id": 0,"name": "全部"}];
 				this.classifyThreeName = '';
+
+				this.contractOne = '';
+				this.contractOneList = [{"id": 0,"name": "全部"}];
+				this.contractTwo = '';
+				this.contractTwoList = [{"id": 0,"name": "全部"}];
+				this.contractThree = '';
+				this.contractThreeList = [{"id": 0,"name": "全部"}];
+
+
 				this.waresName = '';
 				this.saleStateStr = '';
 				this.saleState = 0;
@@ -305,50 +407,62 @@
 						parentId: 0
 					}
 				};
+				this.classifyOne = [{"id": 0,"name": "全部"}];
 				shopProductCategoryt(query).then(res => {
-					// console.log(res)
 					if (res.code == 1) {
-						this.classifyOne = res.data;
+						res.data.map((item, index) => {
+							this.classifyOne.push(item)
+						})
 					}
 				});
 			},
 			selectOne(e) {
-				var query = {
-					data: {
-						parentId: this.classifyOne[e].id
-					}
-				};
-				shopProductCategoryt(query).then(res => {
-					// console.log(res)
-					if (res.code == 1) {
-						this.classifyId = this.classifyOne[e].id;
-						this.classifyTwo = res.data
-					} else {
-						this.classifyTwo = ''; //分类二
-						this.classifyTwoName = '';
-						this.classifyThree = ''; //分类三
-						this.classifyThreeName = '';
-					}
-
-				});
-
+				if(this.classifyOne[e].id != 0){
+					var query = {
+						data: {
+							parentId: this.classifyOne[e].id
+						}
+					};
+					this.classifyTwo = [{"id": 0,"name": "全部"}];
+					shopProductCategoryt(query).then(res => {
+						// console.log(res)
+						if (res.code == 1) {
+							this.classifyId = this.classifyOne[e].id;
+							res.data.map((item, index) => {
+								this.classifyTwo.push(item)
+							})
+						} else {
+							this.classifyTwo = [{"id": 0,"name": "全部"}]; //分类二
+							this.classifyTwoName = '';
+							this.classifyThree = [{"id": 0,"name": "全部"}]; //分类三
+							this.classifyThreeName = '';
+						}
+					
+					});
+				}
 			},
 			selectTwo(e) {
-				var query = {
-					data: {
-						parentId: this.classifyTwo[e].id
-					}
-				};
-				shopProductCategoryt(query).then(res => {
-					// console.log(res)
-					if (res.code == 1) {
-						this.classifyId = this.classifyTwo[e].id;
-						this.classifyThree = res.data
-					} else {
-						this.classifyThree = ''; //分类三
-						this.classifyThreeName = '';
-					}
-				});
+				if(this.classifyTwo[e].id != 0){
+					var query = {
+						data: {
+							parentId: this.classifyTwo[e].id
+						}
+					};
+					this.classifyThree = [{"id": 0,"name": "全部"}];
+					shopProductCategoryt(query).then(res => {
+						// console.log(res)
+						if (res.code == 1) {
+							this.classifyId = this.classifyTwo[e].id;
+							res.data.map((item, index) => {
+								this.classifyThree.push(item)
+							})
+							// this.classifyThree = res.data
+						} else {
+							this.classifyThree = [{"id": 0,"name": "全部"}]; //分类三
+							this.classifyThreeName = '';
+						}
+					});
+				}
 			},
 			selectThree(e) {
 				this.classifyId = this.classifyThree[e].id;
@@ -358,14 +472,31 @@
 			},
 			selectFive(e) {
 				this.waresType = this.waresTypeList[e].type;
-				console.log(this.waresType)
+				if(this.waresType == 1 || this.waresType == 0){
+					this.classifyId = 0;
+					this.contractOneList = [{"id": 0,"name": "全部"}];
+					this.contractTwo = '';
+					this.contractTwoList = [{"id": 0,"name": "全部"}];
+					this.contractThree = '';
+					this.contractThreeList = [{"id": 0,"name": "全部"}];
+					this.productCategory();
+				}else{
+					this.classifyId = 0;
+					this.classifyOne = [{"id": 0,"name": "全部"}];
+					this.classifyOneName = '';
+					this.classifyTwo = [{"id": 0,"name": "全部"}];
+					this.classifyTwoName = '';
+					this.classifyThree = [{"id": 0,"name": "全部"}];
+					this.classifyThreeName = '';
+					this.productCategoryb();
+				}
 			},
 			// 获取 easy-mock 的模拟数据
 			getData() {
 				var query = {
 					data: {
-						// accountId:localStorage.getItem('account_id'),
-						accountId: this.accountId,
+						accountId:localStorage.getItem('account_id'),
+						// accountId: this.accountId,
 						waresName: this.waresName,
 						categoryId: this.classifyId,
 						saleState: this.saleState,
@@ -417,15 +548,14 @@
 				row,
 				rowIndex
 			}) {
-				if (rowIndex === 1) {
-					return 'warning-row';
-				} else if (rowIndex === 3) {
+				if (row.waresType === 2) {
 					return 'success-row';
 				}
 				return '';
 			},
 
 			open() {
+				util.$emit('demo', 'msg');
 				this.$router.push({
 					path: '/add_goods',
 					query: {
@@ -449,7 +579,7 @@
 					this.$refs.childqr.getData(row.id);
 				}
 			},
-			print(){
+			print() {
 				//打印
 			},
 			//入库
@@ -487,7 +617,7 @@
 							waresUnit: this.$refs.childput.goodsInfo.waresCompany,
 							warehousingNum: inventory,
 							warehousingAccount: this.msUsername,
-							accountId: this.accountId,
+							accountId: localStorage.getItem('account_id'),
 						}
 					};
 					addShopHousing(query).then(res => {
@@ -529,6 +659,7 @@
 			},
 			// 编辑操作
 			handleEdit(index, row) {
+				util.$emit('demo', 'msg');
 				this.$router.push({
 					path: '/add_goods',
 					query: {

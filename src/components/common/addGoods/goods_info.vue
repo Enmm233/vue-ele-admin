@@ -13,7 +13,7 @@
 								</span>
 							</div>
 						</el-form-item>
-						
+
 						<el-form-item label="产品分类" v-if="goodsType == '产品'">
 							<div class="flex flex_wrap">
 								<el-select v-model="form.classifyOneName" placeholder="请选择" @change="selectOne" class="handle-select mr10">
@@ -32,7 +32,7 @@
 						</el-form-item>
 						<el-form-item label="服务分类" v-if="goodsType == '服务'">
 							<div class="flex flex_wrap">
-								
+
 								<el-select v-model="form.contractOne" @change="selectOneb" placeholder="请选择" class="handle-select mr10">
 									<el-option v-for="(item,index) in form.contractOneList" :key="item.id" :label="item.name" :value="index">
 									</el-option>
@@ -61,30 +61,22 @@
 						</el-form-item>
 						<el-form-item label="缩略图片">
 							<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:300*300像素，最多1张</div>
-							<el-upload 
-							:action="imgStr" 
-							:data="query" 
-							list-type="picture-card" 
-							:limit="1"
-							 :on-success="breviarySuccess" 
-							 :before-upload="beforeAvatarUpload" 
-							 :on-exceed="handleExceed" 
-							 :on-preview="handleBreviaryPreview"
-							 :on-remove="breviaryRemove" 
+							<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1" :on-success="breviarySuccess"
+							 :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handleBreviaryPreview" :on-remove="breviaryRemove"
 							 :file-list="form.breviaryFileList">
 								<i class="el-icon-plus"></i>
 							</el-upload>
-							
+
 							<el-dialog :visible.sync="form.showBreviaryImg" append-to-body>
 								<img width="100%" :src="form.breviaryImg" alt="">
 							</el-dialog>
 						</el-form-item>
-			
+
 						<el-form-item label="轮播图">
 							<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:1080*900像素，最多6张</div>
-							<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="6"
-							 :on-success="bannerSuccess" :on-preview="handleBannerPreview" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed"
-							 :on-remove="bannerRemove" :file-list="form.bannerFileList">
+							<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="6" :on-success="bannerSuccess"
+							 :on-preview="handleBannerPreview" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-remove="bannerRemove"
+							 :file-list="form.bannerFileList">
 								<i class="el-icon-plus"></i>
 							</el-upload>
 							<el-dialog :visible.sync="form.showBannerImg" append-to-body>
@@ -92,7 +84,7 @@
 							</el-dialog>
 						</el-form-item>
 						<el-form-item label="价格">
-							<el-input v-model="form.waresPriceScope" placeholder="请输入价格范围" class="big-input"></el-input>
+							<el-input type="number" v-model="form.waresPriceScope" placeholder="请输入商品价格" class="big-input"></el-input>
 						</el-form-item>
 						<el-form-item label="广告语">
 							<el-input v-model="form.slogan" placeholder="请输入一句广告语" class="big-input"></el-input>
@@ -121,10 +113,9 @@
 						</el-form-item>
 						<el-form-item label="商品海报" prop="region">
 							<div style="color: #7B7979; font-size: 14px;">图片大小不能超过3M建议尺寸:1080*1980像素，最多1张</div>
-							
-							<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1"
-							 :on-success="posterSuccess" :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handlePosterPreview"
-							 :on-remove="posterRemove" :file-list="form.posterFileList">
+							<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="1" :on-success="posterSuccess"
+							 :before-upload="beforeAvatarUpload" :on-exceed="handleExceed" :on-preview="handlePosterPreview" :on-remove="posterRemove"
+							 :file-list="form.posterFileList">
 								<i class="el-icon-plus"></i>
 							</el-upload>
 							<el-dialog :visible.sync="form.showPosterImg" append-to-body>
@@ -143,14 +134,17 @@
 <script>
 	import {
 		upLoadImg,
-		shopProductCategoryt
+		shopProductCategoryt,
+		delImg
 	} from '../../../api/index.js';
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	import select from '../../../../public/select.json'
 	export default {
 		name: 'info',
-		computed:{
-			...mapState(['imgUrl','imgStr']),  //显示state的数据
+		computed: {
+			...mapState(['imgUrl', 'imgStr']), //显示state的数据
 		},
 		props: ['num'],
 		data() {
@@ -159,8 +153,8 @@
 					data: "{'flag': '3'}"
 				},
 				form: {
-					waresName:'', //商品名称
-					
+					waresName: '', //商品名称
+
 					classifyId: 0, //分类ID
 					classifyOne: '', //分类一
 					classifyOneName: '',
@@ -168,7 +162,7 @@
 					classifyTwoName: '',
 					classifyThree: '', //分类三
 					classifyThreeName: '',
-					
+
 					categoryId: 0,
 					contractOne: '',
 					contractOneList: [],
@@ -176,30 +170,30 @@
 					contractTwoList: [],
 					contractThree: '',
 					contractThreeList: [],
-					
-					waresCompany:'',  //单位
-					unitList:select.unitList,  //单位列表
-					waresSort:'', //商品排序
-					waresPriceScope:'', //价格范围
-					slogan:'', //广告语
-					stockNumber:'', //库存数量
-					reachKeywords:'', //搜索关键字
-					salePromise:'', //售后承诺
-					waresLabel:'', //商品标签
-					
+
+					waresCompany: '', //单位
+					unitList: select.unitList, //单位列表
+					waresSort: '', //商品排序
+					waresPriceScope: '', //价格范围
+					slogan: '', //广告语
+					stockNumber: '', //库存数量
+					reachKeywords: '', //搜索关键字
+					salePromise: '', //售后承诺
+					waresLabel: '', //商品标签
+
 					breviaryImg: '', //预览缩略图路径
 					breviaryUrl: '', //后台返回的缩略图路径
-					breviaryFileList:[],
+					breviaryFileList: [],
 					showBreviaryImg: false, //是否显示缩略图预览
-					
+
 					bannerImg: [], //预览轮播图路径
 					bannerUrl: [], //后台返回的轮播图路径
-					bannerFileList:[],
+					bannerFileList: [],
 					showBannerImg: false, //是否显示轮播图预览
-					
+
 					posterImg: '', //预览海报路径
 					posterUrl: '', //后台返回的海报路径
-					posterFileList:[],
+					posterFileList: [],
 					showPosterImg: false, //是否显示海报预览
 				},
 				dialogImageUrl: '',
@@ -207,29 +201,29 @@
 				dynamicTags: [],
 				inputVisible: false,
 				inputValue: '',
-				goodsType:'产品'
+				goodsType: '产品'
 			};
 		},
-		created(){
+		created() {
 			this.productCategory()
 			// this.productCategoryb();
 		},
 		methods: {
-			selectOneb(index){
+			selectOneb(index) {
 				//选择一级
 				this.form.categoryId = this.form.contractOneList[index].id;
 				this.form.contractOne = this.form.contractOneList[index].name;
 				this.form.contractTwoList = this.form.contractOneList[index].kidList;
 				// console.log(this.categoryId)
 			},
-			selectTwob(index){
+			selectTwob(index) {
 				//选择二级
 				this.form.categoryId = this.form.contractTwoList[index].id;
 				this.form.contractTwo = this.form.contractTwoList[index].name;
 				this.form.contractThreeList = this.form.contractTwoList[index].kidList;
 				// console.log(this.categoryId)
 			},
-			selectThreeb(index){
+			selectThreeb(index) {
 				//选择三级
 				this.form.categoryId = this.form.contractThreeList[index].id;
 				this.form.contractThree = this.form.contractThreeList[index].name;
@@ -260,14 +254,14 @@
 						this.form.classifyId = this.form.classifyOne[e].id;
 						this.form.classifyOneName = this.form.classifyOne[e].name;
 						this.form.classifyTwo = res.data
-					}else{
+					} else {
 						this.form.classifyTwo = ''; //分类二
 						this.form.classifyTwoName = '';
 						this.form.classifyThree = ''; //分类三
 						this.form.classifyThreeName = '';
 					}
 				});
-				
+
 			},
 			selectTwo(e) {
 				var query = {
@@ -279,12 +273,12 @@
 					if (res.code == 1) {
 						this.form.classifyId = this.form.classifyTwo[e].id;
 						this.form.classifyTwoName = this.form.classifyTwo[e].name;
-						
+
 						this.form.classifyThree = res.data
-					}else{
+					} else {
 						this.form.classifyThree = ''; //分类三
 						this.form.classifyThreeName = '';
-					} 
+					}
 				});
 			},
 			selectThree(e) {
@@ -313,7 +307,7 @@
 				this.inputVisible = false;
 				this.inputValue = '';
 			},
-			
+
 			breviarySuccess(res, file) { //缩略图片上传成功
 				this.form.breviaryUrl = res.data;
 				// console.log(this.form.breviaryUrl)
@@ -323,9 +317,17 @@
 				this.form.showBreviaryImg = true;
 			},
 			breviaryRemove(file, fileList) { //缩略图片删除
-				this.form.breviaryUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.form.breviaryUrl = '';
+				});
+
 			},
-			
+
 			bannerSuccess(res, file) { //轮播图片上传成功
 				this.form.bannerUrl.push(res.data);
 			},
@@ -334,12 +336,18 @@
 				this.form.showBannerImg = true;
 			},
 			bannerRemove(file, fileList) { //轮播图片删除
-				this.form.bannerUrl = [];
-				for(var i=0;i<fileList.length;i++){
-					this.form.bannerUrl.push(fileList[i].response.data)
-				}
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.form.bannerUrl = [];
+					for (var i = 0; i < fileList.length; i++) {
+						this.form.bannerUrl.push(fileList[i].response.data)
+					}
+				});
 			},
-			
 			posterSuccess(res, file) { //海报图片上传成功
 				this.form.posterUrl = res.data;
 			},
@@ -348,12 +356,18 @@
 				this.form.showPosterImg = true;
 			},
 			posterRemove(file, fileList) { //海报图片删除
-				this.form.posterUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.form.posterUrl = '';
+				});
 			},
-			
 			beforeAvatarUpload(file) {
 				const isLt3M = file.size / 1024 / 1024 < 3;
-			
+
 				if (!isLt3M) {
 					this.$message.error('上传头像图片大小不能超过 3MB!');
 				}

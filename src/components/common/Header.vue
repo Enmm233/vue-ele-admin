@@ -15,7 +15,7 @@
                     </el-tooltip>
                 </div>
                 <!-- 消息中心 -->
-                <div class="btn-bell">
+               <!-- <div class="btn-bell">
                     <el-tooltip
                         effect="dark"
                         :content="message?`有${message}条未读消息`:`消息中心`"
@@ -26,7 +26,7 @@
                         </router-link>
                     </el-tooltip>
                     <span class="btn-bell-badge" v-if="message"></span>
-                </div>
+                </div> -->
                 <!-- 用户头像 -->
                 <div class="user-avator">
                     <img src="../../assets/img/img.jpg" />
@@ -66,7 +66,7 @@ export default {
 	computed:{
 		...mapState(['msUsername','accountId']),  //显示state的数据
 		username() {
-		    let username = this.msUsername;
+		    let username = localStorage.getItem('ms_username');
 		    return username ? username : localStorage.getItem('login_id');
 		}
 	},
@@ -80,7 +80,7 @@ export default {
 					}
 				};
 				signOut(query).then(res => {
-					console.log(res)
+					// console.log(res)
 					if (res.code == 1) {
 						this.$message.success('退出登录成功');
 						localStorage.removeItem('ms_username');

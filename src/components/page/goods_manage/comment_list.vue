@@ -5,10 +5,10 @@
 			<div class="handle-box flex flex_item_between">
 				<el-form ref="form" :model="form" class="flex flex_wrap" label-width="80px">
 					<el-form-item label="商品">
-						<el-input v-model="form.waresName" placeholder="输入商品名称" class="handle-input"></el-input>
+						<el-input v-model="form.waresName" placeholder="输入商品名称/ID" class="handle-input"></el-input>
 					</el-form-item>
 					<el-form-item label="产品">
-						<el-input v-model="form.productName" placeholder="输入产品名称" class="handle-input"></el-input>
+						<el-input v-model="form.productName" placeholder="输入产品名称/ID" class="handle-input"></el-input>
 					</el-form-item>
 					<el-form-item label="评分">
 						<div class="flex flex_wrap">
@@ -173,7 +173,7 @@
 					data: {
 						commentId: this.content.id,
 						commentUserId: this.content.userId,
-						commentReplyUserId: this.accountId,
+						commentReplyUserId: localStorage.getItem('account_id'),
 						replyContent: this.replyTxt,
 						replyImg: '',
 					}
@@ -213,7 +213,7 @@
 				
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						waresName: this.form.waresName,
 						productName: this.form.productName,
 						starRating: this.form.starRating,

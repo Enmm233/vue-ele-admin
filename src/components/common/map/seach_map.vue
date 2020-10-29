@@ -77,7 +77,7 @@
 									that.mapinfo.map = result.rectangle.split(';')[0].split(',');
 									// console.log(that.mapinfo)
 								} else {
-									console.log(result.info)
+									// console.log(result.info)
 								}
 								}
 							});

@@ -33,7 +33,7 @@
 					<el-form-item label="联系人" class="big-input">
 						<el-input v-model="storeInfo.contactsName" placeholder="请输入联系人名称"></el-input>
 					</el-form-item>
-				<!-- 	<el-form-item label="联系邮箱" class="big-input">
+					<!-- 	<el-form-item label="联系邮箱" class="big-input">
 						<el-input v-model="ruleForm.name" placeholder="请输入联系邮箱"></el-input>
 					</el-form-item> -->
 					<el-form-item label="客服ID号" class="big-input">
@@ -41,17 +41,9 @@
 					</el-form-item>
 					<el-form-item label="法人身份证正反面">
 						<div>图片大小不能超过3M 建议尺寸：1080*900像素</div>
-						<el-upload 
-						:action="imgStr" 
-						:data="query" 
-						list-type="picture-card" 
-						:limit="2" 
-						:before-upload="beforeAvatarUpload" 
-						:on-exceed="handleExceed" 
-						:on-success="bannerSuccess" 
-						:on-preview="handleBannerPreview"
-						:on-remove="bannerRemove" 
-						:file-list="bannerFileList">
+						<el-upload :action="imgStr" :data="query" list-type="picture-card" :limit="2" :before-upload="beforeAvatarUpload"
+						 :on-exceed="handleExceed" :on-success="bannerSuccess" :on-preview="handleBannerPreview" :on-remove="bannerRemove"
+						 :file-list="bannerFileList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showBannerImg" append-to-body>
@@ -62,45 +54,29 @@
 				<div class="form-box add_form">
 					<el-form-item label="店铺Logo">
 						<div>图片大小不能超过3M 建议尺寸：1080*900像素</div>
-						<el-upload 
-						:action="imgStr" 
-						:data="query" 
-						:limit="1" 
-						list-type="picture-card" 
-						:before-upload="beforeAvatarUpload"
-						:on-exceed="handleExceed" 
-						:on-success="breviarySuccess" 
-						:on-preview="handleBreviaryPreview" 
-						:on-remove="breviaryRemove" 
-						:file-list="breviaryFileList">
+						<el-upload :action="imgStr" :data="query" :limit="1" list-type="picture-card" :before-upload="beforeAvatarUpload"
+						 :on-exceed="handleExceed" :on-success="breviarySuccess" :on-preview="handleBreviaryPreview" :on-remove="breviaryRemove"
+						 :file-list="breviaryFileList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showBreviaryImg" append-to-body>
 							<img width="100%" :src="imgUrl+breviaryImg" alt="">
 						</el-dialog>
 					</el-form-item>
-					
+
 					<el-form-item label="营业执照">
 						<div>图片大小不能超过3M 建议尺寸：1080*900像素</div>
-						<el-upload 
-						:action="imgStr" 
-						:data="query" 
-						:limit="1" 
-						list-type="picture-card" 
-						:before-upload="beforeAvatarUpload"
-						:on-exceed="handleExceed" 
-						:on-success="posterSuccess" 
-						:on-preview="handlePosterPreview"
-						:on-remove="posterRemove" 
-						:file-list="posterFileList">
+						<el-upload :action="imgStr" :data="query" :limit="1" list-type="picture-card" :before-upload="beforeAvatarUpload"
+						 :on-exceed="handleExceed" :on-success="posterSuccess" :on-preview="handlePosterPreview" :on-remove="posterRemove"
+						 :file-list="posterFileList">
 							<i class="el-icon-plus"></i>
 						</el-upload>
 						<el-dialog :visible.sync="showPosterImg" append-to-body>
 							<img width="100%" :src="imgUrl+posterImg" alt="">
 						</el-dialog>
 					</el-form-item>
-								
-					
+
+
 					<el-form-item label="实体店地址" class="big-input">
 						<seach-map :infoAddress="storeInfo.contactsAddress" :infolonlat="storeInfo.longitudeLatitude" ref="map"></seach-map>
 					</el-form-item>
@@ -120,18 +96,21 @@
 	import {
 		getStoreByUserId,
 		getShopStoreCategory,
-		updStore
+		updStore,
+		delImg
 	} from '../../../api/index';
 	import seachMap from '../map/seach_map.vue'
-	import { mapState } from 'vuex'
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		name: "addStore",
 		components: {
 			seachMap
 		},
-		computed:{
-		     ...mapState(['accountId','imgUrl','imgStr']),  //显示state的数据
-		    },
+		computed: {
+			...mapState(['accountId', 'imgUrl', 'imgStr']), //显示state的数据
+		},
 		data() {
 			return {
 				query: { //上传图片固定参数
@@ -139,7 +118,7 @@
 				},
 				// dialogImageUrl: '',
 				// dialogVisible: false,
-				storeInfo:'',
+				storeInfo: '',
 				ruleForm: {
 					name: '',
 					region: '',
@@ -147,30 +126,30 @@
 					resource: '',
 					desc: ''
 				},
-				shopStoreCategory:[],
-				shopStoreCategoryId:'',
-				shopStoreCategoryName:'',
-				storeStatus:'',
-				storeStatusName:'',
+				shopStoreCategory: [],
+				shopStoreCategoryId: '',
+				shopStoreCategoryName: '',
+				storeStatus: '',
+				storeStatusName: '',
 				visible: false,
-				
+
 				bannerImg: [], //预览身份证路径
 				bannerUrl: [], //后台返回的身份证路径
-				bannerFileList:[],
+				bannerFileList: [],
 				showBannerImg: false, //是否显示身份证预览
-				
+
 				breviaryImg: '', //预览店铺Logo路径
 				breviaryUrl: '', //后台返回的店铺Logo路径
-				breviaryFileList:[],
+				breviaryFileList: [],
 				showBreviaryImg: false, //是否显示店铺Logo预览
-				
+
 				posterImg: '', //预览营业执照路径
 				posterUrl: '', //后台返回的营业执照路径
-				posterFileList:[],
+				posterFileList: [],
 				showPosterImg: false, //是否显示营业执照预览
 			}
 		},
-		created(){
+		created() {
 			this.getData();
 			this.storeCategory()
 		},
@@ -179,99 +158,100 @@
 			getData() {
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 					}
 				};
 				getStoreByUserId(query).then(res => {
 					if (res.code == 1) {
 						this.storeInfo = res.data;
 						//身份证回显
-						if(!res.data.corporateIdentityCard && typeof(res.data.corporateIdentityCard)!='undefined' && res.data.corporateIdentityCard!=0){
+						if (!res.data.corporateIdentityCard && typeof(res.data.corporateIdentityCard) != 'undefined' && res.data.corporateIdentityCard !=
+							0) {
 							// console.log(res.data.waresImg)
-						}else{
+						} else {
 							this.bannerUrl = res.data.corporateIdentityCard.split(',');
 							var urlStr2 = res.data.corporateIdentityCard.split(',');
-							 urlStr2.forEach(item => {
+							urlStr2.forEach(item => {
 								let obj = new Object();
-								obj.url = this.imgUrl+item;
+								obj.url = this.imgUrl + item;
 								this.bannerFileList.push(obj);
-							  });
+							});
 						}
 						//店铺logo回显
-						if(!res.data.logoImg && typeof(res.data.logoImg)!='undefined' && res.data.logoImg!=0){
+						if (!res.data.logoImg && typeof(res.data.logoImg) != 'undefined' && res.data.logoImg != 0) {
 							// console.log(res.data.waresImg)
-						}else{
+						} else {
 							this.breviaryUrl = res.data.logoImg;
 							var urlStr2 = res.data.logoImg.split(',');
-							 urlStr2.forEach(item => {
+							urlStr2.forEach(item => {
 								let obj = new Object();
-								obj.url = this.imgUrl+item;
+								obj.url = this.imgUrl + item;
 								this.breviaryFileList.push(obj);
-							  });
+							});
 						}
 						//营业执照回显
-						if(!res.data.businessLicense && typeof(res.data.businessLicense)!='undefined' && res.data.businessLicense!=0){
+						if (!res.data.businessLicense && typeof(res.data.businessLicense) != 'undefined' && res.data.businessLicense !=
+							0) {
 							// console.log(res.data.waresImg)
-						}else{
+						} else {
 							this.posterUrl = res.data.businessLicense;
 							var urlStr2 = res.data.businessLicense.split(',');
-							 urlStr2.forEach(item => {
+							urlStr2.forEach(item => {
 								let obj = new Object();
-								obj.url = this.imgUrl+item;
+								obj.url = this.imgUrl + item;
 								this.posterFileList.push(obj);
-							  });
+							});
 						}
-						
-						
+
+
 						//营业执照回显
-						if(!res.data.storeStatus && typeof(res.data.storeStatus)!='undefined' && res.data.storeStatus!=0){
+						if (!res.data.storeStatus && typeof(res.data.storeStatus) != 'undefined' && res.data.storeStatus != 0) {
 							// console.log(res.data.waresImg)
-						}else{
+						} else {
 							// console.log(res.data.storeStatus)
 							this.storeStatus = res.data.storeStatus;
-							if(res.data.storeStatus == 0){
+							if (res.data.storeStatus == 0) {
 								this.storeStatusName = '资料待完善';
 							}
-							if(res.data.storeStatus == 1){
+							if (res.data.storeStatus == 1) {
 								this.storeStatusName = '营业中';
 							}
-							if(res.data.storeStatus == 2){
+							if (res.data.storeStatus == 2) {
 								this.storeStatusName = '整改中';
 							}
-							if(res.data.storeStatus == 3){
+							if (res.data.storeStatus == 3) {
 								this.storeStatusName = '盘点中';
 							}
-							if(res.data.storeStatus == 4){
+							if (res.data.storeStatus == 4) {
 								this.storeStatusName = '已关闭';
 							}
 						}
-						
-						//营业执照回显
-						if(!res.data.categoryId && typeof(res.data.categoryId)!='undefined' && res.data.categoryId!=0){
-							// console.log(res.data.waresImg)
-						}else{
-							// console.log(res.data.storeStatus)
+						//店铺类别
+						if (!res.data.categoryId && typeof(res.data.categoryId) != 'undefined' && res.data.categoryId != 0) {
+						} else {
 							this.shopStoreCategoryId = res.data.categoryId;
 							this.shopStoreCategoryName = res.data.categoryName;
 						}
 						this.$refs.map.mapinfo.map = res.data.longitudeLatitude;
 						this.$refs.map.mapinfo.address = res.data.contactsAddress;
-						
-						
 					}
 				});
 			},
 			submitForm() {
 				var mapa = this.$refs.map.mapinfo;
-				if(this.shopStoreCategoryId == ''){
+				if (this.shopStoreCategoryId == '') {
 					var categoryId = 0;
-				}else{
+				} else {
 					var categoryId = this.shopStoreCategoryId;
 				}
-				if(this.storeInfo.chatId == ''){
+				if (this.storeInfo.chatId == '') {
 					var chatId = 0;
-				}else{
+				} else {
 					var chatId = this.storeInfo.chatId;
+				}
+				if (!mapa.address && typeof(mapa.address) != 'undefined' && mapa.address != 0) {
+					this.$message.error('请输入并搜索地址');
+					return;
 				}
 				var query = {
 					data: {
@@ -280,19 +260,19 @@
 						storeStatus: this.storeStatus,
 						categoryId: categoryId,
 						logoImg: this.breviaryUrl,
-						createAccountId: this.accountId,
+						createAccountId: localStorage.getItem('account_id'),
 						contactsName: this.storeInfo.contactsName,
 						contactsTel: this.storeInfo.contactsTel,
 						contactsAddress: mapa.address,
 						longitudeLatitude: mapa.map.toString(),
-						contactsIdCard:this.storeInfo.contactsIdCard,
-						webDescribe:this.storeInfo.webDescribe,
+						contactsIdCard: this.storeInfo.contactsIdCard,
+						webDescribe: this.storeInfo.webDescribe,
 						chatId: chatId,
 						businessScope: this.storeInfo.businessScope,
 						corporateIdentityCard: this.bannerUrl.toString(),
 						businessLicense: this.posterUrl,
-						cooperative:this.storeInfo.cooperative,
-						cooperativeName:this.storeInfo.cooperativeName,
+						cooperative: this.storeInfo.cooperative,
+						cooperativeName: this.storeInfo.cooperativeName,
 					}
 				};
 				updStore(query).then(res => {
@@ -302,8 +282,6 @@
 					}
 				});
 			},
-	
-			
 			posterSuccess(res, file) { //海报图片上传成功
 				this.posterUrl = res.data;
 			},
@@ -312,9 +290,15 @@
 				this.showPosterImg = true;
 			},
 			posterRemove(file, fileList) { //海报图片删除
-				this.posterUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.posterUrl = '';
+				});
 			},
-			
 			breviarySuccess(res, file) { //缩略图片上传成功
 				this.breviaryUrl = res.data;
 				// console.log(this.form.breviaryUrl)
@@ -324,13 +308,17 @@
 				this.showBreviaryImg = true;
 			},
 			breviaryRemove(file, fileList) { //缩略图片删除
-				this.breviaryUrl = '';
+				var query = {
+					data: {
+						imgPath: file.response.data
+					}
+				};
+				delImg(query).then(res => {
+					this.breviaryUrl = '';
+				});
 			},
-			
 			bannerSuccess(res, file) { //轮播图片上传成功
-				
 				this.bannerUrl.push(res.data);
-				console.log(this.bannerUrl)
 			},
 			handleBannerPreview(file) { //轮播图片预览
 				this.bannerImg.push(file.url);
@@ -338,14 +326,14 @@
 			},
 			bannerRemove(file, fileList) { //轮播图片删除
 				this.bannerUrl = [];
-				for(var i=0;i<fileList.length;i++){
+				for (var i = 0; i < fileList.length; i++) {
 					this.bannerUrl.push(fileList[i].response.data)
 				}
 			},
-			
+
 			beforeAvatarUpload(file) {
 				const isLt3M = file.size / 1024 / 1024 < 3;
-			
+
 				if (!isLt3M) {
 					this.$message.error('上传头像图片大小不能超过 3MB!');
 				}
@@ -371,14 +359,6 @@
 					}
 				});
 			},
-			
-			// handleRemove(file, fileList) {
-			// 	console.log(file, fileList);
-			// },
-			// handlePictureCardPreview(file) {
-			// 	this.dialogImageUrl = file.url;
-			// 	this.dialogVisible = true;
-			// },
 			resetForm() {
 				this.$emit('cancel');
 			}
@@ -387,10 +367,9 @@
 </script>
 
 <style>
-	.add_btn{
+	.add_btn {
 		position: absolute;
 		bottom: 0;
 		right: 5%;
 	}
-	
 </style>

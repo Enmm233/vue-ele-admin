@@ -5,13 +5,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
 	state:{
-		// URL: 'http://192.168.0.116:8080',  //接口地址
+		// URL: 'http://192.168.0.119:8080',  //接口地址
 		 URL: 'http://192.168.0.222:8080',  //接口地址
 		 // URL: ' http://127.0.0.1:8080/zhc_war',  //接口地址
 		 // URL: 'http://101.37.204.197/zhc_war',  //接口地址
+		// imgUrl:'http://192.168.0.119:8080/img/', //图片地址
 		imgUrl:'http://192.168.0.222:8080/img/', //图片地址
 		// imgUrl:' http://127.0.0.1:8080/zhc_war/img/', //图片地址
 		// imgUrl:'http://101.37.204.197/zhc_war/img/', //图片地址
+		// imgStr:'http://192.168.0.119:8080/api/uploadImg',  //图片接口
 		imgStr:'http://192.168.0.222:8080/api/uploadImg',  //图片接口
 		// imgStr:' http://127.0.0.1:8080/zhc_war/api/uploadImg',  //图片接口
 		// imgStr:'http://101.37.204.197/zhc_war/api/uploadImg', //图片接口

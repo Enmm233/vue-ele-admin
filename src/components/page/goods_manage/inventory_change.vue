@@ -9,9 +9,9 @@
             		</el-form-item>
 					
 					<el-form-item label="入库批次">
-            			<el-input v-model="form.warehousingBatch" placeholder="输入产品名称/ID" class="handle-input mr10"></el-input>
+            			<el-input v-model="form.warehousingBatch" placeholder="输入产品入库批次" class="handle-input mr10"></el-input>
             		</el-form-item>
-					<el-form-item label="入库批次" class="mr10">
+					<el-form-item label="入库时间" class="mr10">
             			<div class="block">
             			    <el-date-picker
 							  @change="time"
@@ -114,7 +114,7 @@ export default {
 			// console.log(this.accountId)
 			var query = {
 				data:{
-					accountId:this.accountId,
+					accountId:localStorage.getItem('account_id'),
 					productName:item.productName,
 					warehousingBatch:item.warehousingBatch,
 					startTime:'',  		 

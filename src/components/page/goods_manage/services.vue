@@ -5,7 +5,7 @@
 			<div class="handle-box flex flex_item_between">
 				<el-form ref="form" class="flex flex_wrap" label-width="80px">
 					<el-form-item label="服务名称">
-						<el-input v-model="serviceName" class="handle-input mr10"></el-input>
+						<el-input v-model="serviceName" placeholder="请输入名称/ID" class="handle-input mr10"></el-input>
 					</el-form-item>
 					<el-form-item label="服务分类">
 						<div class="flex flex_wrap">
@@ -40,7 +40,7 @@
 				<!-- <el-button type="info" @click="toPage">删除</el-button> -->
 			</div>
 
-			<el-table height="555" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header">
+			<el-table height="546" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header">
 				<el-table-column type="selection" width="55" align="center"></el-table-column>
 				<el-table-column prop="id" label="服务ID" width="100" align="center"></el-table-column>
 				<el-table-column prop="name" label="服务名称" width="200"></el-table-column>
@@ -55,7 +55,7 @@
 				</el-table-column>
 				<el-table-column label="服务图片" width="120" align="center">
 					<template slot-scope="scope">
-						<el-image class="table-td-thumb" :src="imgUrl+scope.row.serviceFirstImg" :preview-src-list="[imgUrl+scope.row.serviceFirstImg]"></el-image>
+						<el-image class="table-td-thumb" :src="imgUrl+scope.row.serviceFirstImg" @click.stop="handleClickItem" :preview-src-list="[imgUrl+scope.row.serviceFirstImg]"></el-image>
 					</template>
 				</el-table-column>
 				<el-table-column label="品牌名称" width="120" align="center">
@@ -119,11 +119,11 @@
 				serviceName:'', //服务名称
 				categoryId:0,
 				contractOne:'',
-				contractOneList:[],
+				contractOneList:[{"id": 0,"name": "全部"}],
 				contractTwo:'',
-				contractTwoList:[],
+				contractTwoList:[{"id": 0,"name": "全部"}],
 				contractThree:'',
-				contractThreeList:[],
+				contractThreeList:[{"id": 0,"name": "全部"}],
 				brandName:'', //品牌名
 				address:'', //地址
 				page: 1,
@@ -145,6 +145,21 @@
 			this.getData();
 		},
 		methods: {
+			handleClickItem() {
+				// 获取遮罩层dom
+				var domImageMask = '';
+				var time = setTimeout(function() {
+					domImageMask = document.querySelector(".el-image-viewer__mask");
+					if (!domImageMask) {
+						return;
+					}
+					domImageMask.addEventListener("click", () => {
+						// 点击遮罩层时调用关闭按钮的 click 事件
+						document.querySelector(".el-image-viewer__close").click();
+						clearTimeout(time);
+					});
+				}, 100)
+			},
 			refreshData(){
 				//刷新列表
 				this.serviceName = '';
@@ -152,11 +167,11 @@
 				this.address = '';
 				this.categoryId = 0;
 				this.contractOne = '';
-				this.contractOneList = [];
+				this.contractOneList = [{"id": 0,"name": "全部"}];
 				this.contractTwo = '';
-				this.contractTwoList = [];
+				this.contractTwoList = [{"id": 0,"name": "全部"}];
 				this.contractThree = '';
-				this.contractThreeList = [];
+				this.contractThreeList = [{"id": 0,"name": "全部"}];
 				this.page = 1;
 				this.pageTotal = 0;
 				this.getData();
@@ -171,26 +186,30 @@
 				};
 				getMerchandiseCategories(query).then(res => {
 					if (res.code == 1) {
-						this.contractOneList = res.data
+						// this.contractOneList = res.data
+						res.data.map((item, index) => {
+							this.contractOneList.push(item)
+						})
 					}
 				});
 			},
 			selectOne(index){
 				//选择一级
 				this.categoryId = this.contractOneList[index].id;
-				this.contractTwoList = this.contractOneList[index].kidList;
-				// console.log(this.categoryId)
+				this.contractOneList[index].kidList.map((item, index) => {
+					this.contractTwoList.push(item)
+				})
 			},
 			selectTwo(index){
 				//选择二级
 				this.categoryId = this.contractTwoList[index].id;
-				this.contractThreeList = this.contractTwoList[index].kidList;
-				// console.log(this.categoryId)
+				this.contractTwoList[index].kidList.map((item, index) => {
+					this.contractThreeList.push(item)
+				})
 			},
 			selectThree(index){
 				//选择三级
 				this.categoryId = this.contractThreeList[index].id;
-				// console.log(this.categoryId)
 			},
 			addProductCil(data) { //添加
 				this.addProduct = !data.addProduct;
@@ -215,7 +234,7 @@
 				}
 			},
 			handleChange(value) {
-				console.log(label);
+				// console.log(label);
 			},
 			
 			// toPage() {
@@ -234,13 +253,13 @@
 			getData() {
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						serviceName: this.serviceName,
 						categoryId: this.categoryId,
 						brandName: this.brandName,
 						address: this.address,
 						nowPage: this.page,
-						pageCount: 9,
+						pageCount: 8,
 					}
 				};
 				listShopService(query).then(res => {

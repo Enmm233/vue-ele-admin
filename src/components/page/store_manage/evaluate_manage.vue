@@ -7,8 +7,7 @@
 			<div class="handle-box">
 				<el-button type="success" @click="refreshData">刷新列表</el-button>
 			</div>
-			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header"
-			 @selection-change="handleSelectionChange">
+			<el-table height="600" :data="tableData.data" border class="table" ref="multipleTable" header-cell-class-name="table-header">
 				<el-table-column prop="userId" label="用户ID" align="center" width="200"></el-table-column>
 				<el-table-column prop="nickname" label="用户昵称" align="center" width="200"></el-table-column>
 				<el-table-column prop="commentTime" label="评论时间" align="center" width="150"></el-table-column>
@@ -20,11 +19,11 @@
 				</el-table-column>
 				<el-table-column prop="starRating" label="评分" align="center" width="100"></el-table-column>
 				<el-table-column prop="content" label="评论内容" align="center"></el-table-column>
-				<!-- <el-table-column label="操作" align="center" width="150">
+				<el-table-column label="操作" align="center" width="150">
 					<template slot-scope="scope">
 						<el-button type="danger" size="mini" @click="handleEdit(scope.$index, scope.row)">回复</el-button>
 					</template>
-				</el-table-column> -->
+				</el-table-column>
 			</el-table>
 			
 			<div class="pagination">
@@ -33,7 +32,7 @@
 			</div>
 		</div>
 
-		<el-dialog :close-on-click-modal="false" title="添加项目" :visible.sync="dialogVisible" width="30%" append-to-body>
+		<el-dialog :close-on-click-modal="false" title="回复内容" :visible.sync="dialogVisible" width="30%" append-to-body>
 			<div class="evaluate_reply">
 				<div>
 					<p class="title">用户评论内容：</p>
@@ -45,7 +44,7 @@
 						<el-input
 						  type="textarea"
 						  :autosize="{ minRows: 4, maxRows: 10}"
-						  placeholder="请输入内容"
+						  placeholder="请输入回复内容"
 						  v-model="replyTxt">
 						</el-input>
 					</div>
@@ -64,7 +63,9 @@
 <script>
 	import {
 		insertShopWaresCommenreply,
-		listStoreComment
+		listStoreComment,
+		getStoreByUserId,
+		addShopStoreCommentReply
 	} from '../../../api/index';
 	import { mapState } from 'vuex'
 	import { dateFormat } from '../../../utils/utils.js'
@@ -85,10 +86,12 @@
 				delList: [],
 				content:'',
 				replyTxt:'', 
+				storeInfo:'', 
 			};
 		},
 		created() {
 			this.getData();
+			this.getDatab();
 		},
 		methods: {
 			refreshData(){
@@ -96,6 +99,24 @@
 			   this.page = 1;
 			   this.pageTotal = 0;
 			   this.getData();
+			  },
+			  handleEdit(index, row) {
+			  	this.content = row;
+			  	this.dialogVisible = true;
+			  },
+			  // 获取 easy-mock 的模拟数据
+			  getDatab() {
+			  	var that = this;
+			  	var query = {
+			  		data: {
+			  			accountId: localStorage.getItem('account_id'),
+			  		}
+			  	};
+			  	getStoreByUserId(query).then(res => {
+			  		if (res.code == 1) {
+			  			that.storeInfo = res.data;
+			  		}
+			  	});
 			  },
 			//回复评论
 			saveEdit(){
@@ -106,13 +127,14 @@
 				var query = {
 					data: {
 						commentId: this.content.id,
-						commentUserId: this.content.userId,
-						commentReplyUserId: this.accountId,
-						replyContent: this.replyTxt,
-						replyImg: '',
+						commentReplyUserId: this.storeInfo.id,
+						commentReplyUserName: this.storeInfo.name,
+						commentReplyUserAvatar: this.storeInfo.logoImg,
+						content: this.replyTxt,
+						images: '',
 					}
 				};
-				insertShopWaresCommenreply(query).then(res => {
+				addShopStoreCommentReply(query).then(res => {
 					if (res.code == 1) {
 						this.$message.success('回复成功');
 						this.dialogVisible = false;
@@ -133,7 +155,7 @@
 			getData() {
 				var query = {
 					data: {
-						accountId: this.accountId,
+						accountId: localStorage.getItem('account_id'),
 						nowPage: this.page,
 						pageCount: 6,
 					}
@@ -154,20 +176,10 @@
 					}
 				});
 			},
-			handleEdit(index, row) {
-				this.content = row;
-				this.dialogVisible = true;
-			},
 			// 触发搜索按钮
 			handleSearch() {
 				this.getData();
 			},
-			// 多选操作
-			handleSelectionChange(val) {
-				this.multipleSelection = val;
-			},
-	
-
 			// 分页导航
 			handlePageChange(val) {
 				this.page = val;

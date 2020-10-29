@@ -145,12 +145,12 @@
 							<div class="txt">物流清单</div>
 						</div>
 						<div>
-							<el-timeline>
+						<!-- 	<el-timeline>
 								<el-timeline-item v-for="(activity, index) in activities" :key="index" :type="activity.type" color="#0bbd87"
 								 :size="activity.size" :timestamp="activity.timestamp">
 									{{activity.content}}
 								</el-timeline-item>
-							</el-timeline>
+							</el-timeline> -->
 						</div>
 					</div>
 				</el-col>
@@ -238,11 +238,12 @@
 	}
 
 	.border_box .info_txt .info {
+		padding: 0;
 		margin-bottom: 20px;
 	}
 
 	.border_box .info_txt .info .left {
-		width: 20%;
+		width: 28%;
 		text-align: end;
 		font-size: 14px;
 		font-weight: bold;

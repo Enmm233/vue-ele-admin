@@ -97,8 +97,8 @@
 				this.goodsAData = [];
 				var query = {
 					data: {
-						// accountId:localStorage.getItem('account_id'),
-						accountId: this.accountId,
+						accountId:localStorage.getItem('account_id'),
+						// accountId: this.accountId,
 						giftName: '',
 						giftType: 0,
 						giftSort: 0,

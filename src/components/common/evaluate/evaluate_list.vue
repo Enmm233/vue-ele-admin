@@ -95,7 +95,7 @@
 					data: {
 						commentId: this.content.id,
 						commentUserId: this.content.userId,
-						commentReplyUserId: this.accountId,
+						commentReplyUserId: localStorage.getItem('account_id'),
 						replyContent: this.replyTxt,
 						replyImg: '',
 					}

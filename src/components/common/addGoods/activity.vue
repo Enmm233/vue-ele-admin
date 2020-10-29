@@ -131,8 +131,8 @@
 				this.goodsAData = [];
 				var query = {
 					data: {
-						// accountId:localStorage.getItem('account_id'),
-						accountId: this.accountId,
+						accountId:localStorage.getItem('account_id'),
+						// accountId: this.accountId,
 						activityType: this.type,
 						nowPage: this.page,
 						pageCount: 9,

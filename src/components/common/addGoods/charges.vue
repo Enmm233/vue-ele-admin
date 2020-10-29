@@ -93,8 +93,8 @@
 				this.goodsAData = [];
 				var query = {
 					data: {
-						// accountId:localStorage.getItem('account_id'),
-						accountId: this.accountId,
+						accountId:localStorage.getItem('account_id'),
+						// accountId: this.accountId,
 						name: '',
 						type: 0,
 						sort: 0,

@@ -72,7 +72,7 @@
 			};
 		},
 		created() {
-			console.log(this.info)
+			// console.log(this.info)
 		},
 		methods: {
 			clickLi(data,infoItem) {

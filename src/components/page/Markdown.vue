@@ -53,8 +53,8 @@
                 this.html = render;
             },
             submit(){
-                console.log(this.content);
-                console.log(this.html);
+                // console.log(this.content);
+                // console.log(this.html);
                 this.$message.success('提交成功！');
             }
         }

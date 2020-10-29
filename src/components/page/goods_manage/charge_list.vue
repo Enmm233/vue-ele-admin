@@ -30,6 +30,7 @@
 					<el-form-item label="费用类型">
 						<div class="flex flex_wrap">
 							<el-select v-model="searchForm.expenseTypeStr" @change="expenseTypeCil" placeholder="默认" class="handle-select mr10">
+								<el-option key="0" label="全部" value="0"></el-option>
 								<el-option key="1" label="增加" value="1"></el-option>
 								<el-option key="2" label="减少" value="2"></el-option>
 							</el-select>
@@ -39,6 +40,7 @@
 					<el-form-item label="展示类型">
 						<div class="flex flex_wrap">
 							<el-select v-model="searchForm.showTypeStr" placeholder="默认" @change="showTypeCil" class="handle-select mr10">
+								<el-option key="0" label="全部" value="0"></el-option>
 								<el-option key="1" label="数量型" value="1"></el-option>
 								<el-option key="2" label="开头型" value="2"></el-option>
 							</el-select>
@@ -316,8 +318,8 @@
 				}
 				var query = {
 					data:{
-						// accountId:localStorage.getItem('account_id'),
-						accountId:this.accountId,
+						accountId:localStorage.getItem('account_id'),
+						// accountId:this.accountId,
 						name:item.name,
 						type:item.type,
 						sort:item.sortNum,
@@ -488,7 +490,7 @@
 				var item = this.searchForm;
 				var query = {
 					data:{
-						accountId:this.accountId,
+						accountId:localStorage.getItem('account_id'),
 						name:item.name,
 						type:item.type,
 						sort:item.sortNum,  		 
